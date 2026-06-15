@@ -1,0 +1,102 @@
+# MaquinaA docker-compose.yml - VERSIÓN PARA ESTABILIDAD LOCAL MÁXIMA
+services:
+  cassandra-node1:
+    image: cassandra:4.1
+    container_name: cassandra-node1
+    hostname: cassandra-node1
+    ports:
+      - "${IP_MAQUINA_A}:9042:9042"
+      - "${IP_MAQUINA_A}:7000:7000" # Expón el puerto gossip para MaquinaB
+    volumes:
+      - cassandra-data-node1:/var/lib/cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=CafeteriaCluster # Mantén el mismo nombre de clúster
+      # Semillas: los 3 nombres de servicio locales + IP de MaquinaB
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3,${IP_MAQUINA_B}
+      - CASSANDRA_LISTEN_ADDRESS=cassandra-node1
+      - CASSANDRA_BROADCAST_ADDRESS=${IP_MAQUINA_A}    # ¡CRÍTICO! Anuncia IP_MAQUINA_A para MaquinaB
+      - CASSANDRA_RPC_ADDRESS=0.0.0.0
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=${IP_MAQUINA_A}
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=RAC1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - JVM_OPTS=-Xms512M -Xmx512M
+    networks:
+      - cafeteria-net
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'SHOW VERSION' || exit 1"]
+      interval: 30s
+      timeout: 25s  # Un poco más de timeout
+      retries: 12
+      start_period: 240s # MUCHO más tiempo de gracia inicial
+
+  cassandra-node2:
+    image: cassandra:4.1
+    container_name: cassandra-node2
+    hostname: cassandra-node2
+    ports:
+      - "${IP_MAQUINA_A}:9043:9042"
+    volumes:
+      - cassandra-data-node2:/var/lib/cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=CafeteriaCluster
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3 # TODOS LOS NODOS LOCALES
+      - CASSANDRA_LISTEN_ADDRESS=cassandra-node2
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra-node2       # Anuncia su nombre de servicio
+      - CASSANDRA_RPC_ADDRESS=0.0.0.0
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=${IP_MAQUINA_A}
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=RAC1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - JVM_OPTS=-Xms512M -Xmx512M
+    networks:
+      - cafeteria-net
+    depends_on:
+      cassandra-node1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'SHOW VERSION' || exit 1"]
+      interval: 30s
+      timeout: 25s
+      retries: 12
+      start_period: 240s
+
+  cassandra-node3:
+    image: cassandra:4.1
+    container_name: cassandra-node3
+    hostname: cassandra-node3
+    ports:
+      - "${IP_MAQUINA_A}:9044:9042"
+    volumes:
+      - cassandra-data-node3:/var/lib/cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=CafeteriaCluster
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3 # TODOS LOS NODOS LOCALES
+      - CASSANDRA_LISTEN_ADDRESS=cassandra-node3
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra-node3       # Anuncia su nombre de servicio
+      - CASSANDRA_RPC_ADDRESS=0.0.0.0
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=${IP_MAQUINA_A}
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=RAC1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - JVM_OPTS=-Xms512M -Xmx512M
+    networks:
+      - cafeteria-net
+    depends_on: # Dependencia secuencial
+      cassandra-node2:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'SHOW VERSION' || exit 1"]
+      interval: 30s
+      timeout: 25s
+      retries: 12
+      start_period: 240s
+
+volumes:
+  cassandra-data-node1:
+  cassandra-data-node2:
+  cassandra-data-node3:
+
+networks:
+  cafeteria-net:
+    driver: bridge
