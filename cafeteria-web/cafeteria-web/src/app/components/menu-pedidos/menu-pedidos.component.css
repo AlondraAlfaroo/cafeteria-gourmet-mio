@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600&display=swap');
+
+.container {
+    font-family: 'Lato', sans-serif;
+    color: #1E3932;
+}
+
+.header {
+    font-family: 'Playfair Display', serif;
+    color: #1E3932;
+    font-size: 2rem;
+    font-weight: 600;
+    padding-bottom: 14px;
+    position: relative;
+}
+
+.header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #00704A;
+    border-radius: 2px;
+    margin: 10px auto 0;
+}
+
+.sb-section-title {
+    font-family: 'Playfair Display', serif;
+    color: #1E3932;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.sb-btn {
+    background-color: #1E3932 !important;
+    border-radius: 24px !important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+}
+
+.sb-btn:hover {
+    background-color: #00704A !important;
+}
+
+.input-field input:focus {
+    border-bottom: 1px solid #00704A !important;
+    box-shadow: 0 1px 0 0 #00704A !important;
+}
+
+.input-field input:focus + label,
+label.active {
+    color: #00704A !important;
+}
+
+.sb-product-card {
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    border: 1px solid #D4E9E2 !important;
+    box-shadow: none !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+.sb-product-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 28px rgba(30,57,50,0.13) !important;
+    border-color: #00704A !important;
+}
+
+.sb-card-name {
+    font-family: 'Playfair Display', serif !important;
+    color: #1E3932 !important;
+}
+
+.sb-card-btn {
+    background: #00704A !important;
+    color: #ffffff !important;
+    border-radius: 20px !important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 700 !important;
+}
+
+.sb-card-btn:hover {
+    background: #1E3932 !important;
+}
+
+.sb-card-reveal {
+    background: #1E3932 !important;
+}
+
+.sb-card-reveal p {
+    color: #D4E9E2 !important;
+    font-family: 'Lato', sans-serif !important;
+}
+
+.sb-card-reveal .card-title {
+    color: #ffffff !important;
+    font-family: 'Playfair Display', serif !important;
+}
+
+.sb-card-price {
+    color: #CBA258 !important;
+    font-weight: 700 !important;
+}

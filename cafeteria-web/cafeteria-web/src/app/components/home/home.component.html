@@ -1,0 +1,155 @@
+<div class="slider">
+    <ul class="slides">
+        <li>
+            <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80"
+                alt="Granos de Café de Calidad">
+            <div class="caption center-align white-text" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.7);">
+                <h2>Cafetería Gourmet</h2>
+                <h5 class="light text-lighten-3">El sabor se propaga a todos los nodos de tu paladar</h5>
+                <a (click)="accionProducto()" class="btn-large waves-effect waves-light hoverable"
+                    style="margin-top: 20px; animation: pulse 2s infinite;">¡Pide Ahora!</a>
+            </div>
+        </li>
+        <li>
+            <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1400&q=80" alt="Café Artesanal">
+            <div class="caption left-align white-text" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.7);">
+                <h3>Pasión por el Café</h3>
+                <h5 class="light text-lighten-3">Descubre nuestras mezclas únicas y artesanales.</h5>
+                <a routerLink="/registrar-pedido" class="btn waves-effect waves-light sb-btn-slide"
+                    style="margin-top: 10px;">Ver Menú de Pedidos</a>
+            </div>
+        </li>
+        <li>
+            <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1400&q=80"
+                alt="Ambiente acogedor">
+            <div class="caption right-align white-text" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.7);">
+                <h3>Tu Momento Perfecto</h3>
+                <h5 class="light text-lighten-3">Disfruta de un ambiente acogedor y el mejor servicio.</h5>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<br><br>
+
+<div class="section center-align" style="padding-top: 30px; padding-bottom: 30px; background-color: #F1F8F6;">
+    <div class="container">
+        <div class="social-icons-home" style="margin-bottom: 30px;">
+            <a href="https://facebook.com/" target="_blank" rel="noopener"
+                class="btn-floating btn-large waves-effect waves-light brown darken-2" style="margin: 0 10px;"><i
+                    class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com/" target="_blank" rel="noopener"
+                class="btn-floating btn-large waves-effect waves-light brown darken-2" style="margin: 0 10px;"><i
+                    class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com/" target="_blank" rel="noopener"
+                class="btn-floating btn-large waves-effect waves-light brown darken-2" style="margin: 0 10px;"><i
+                    class="fab fa-instagram"></i></a>
+            <a href="mailto:info@cafeteriagourmet.com"
+                class="btn-floating btn-large waves-effect waves-light brown darken-2" style="margin: 0 10px;"><i
+                    class="material-icons">mail_outline</i></a>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="section" id="aboutus" style="background-color: #ffffff;">
+        <div class="container">
+            <h2 class="header center-align">Conócenos</h2>
+            <div class="row valign-wrapper">
+                <div class="col s12 m7">
+                    <p class="grey-text text-darken-3 lighten-3 flow-text">
+                        En <strong>Cafetería Gourmet</strong>, cada taza cuenta una historia. Fusionamos la pasión por el
+                        café de especialidad con la robustez de la tecnología de bases de datos distribuidas. Nuestro sistema,
+                        potenciado por Apache Cassandra, está diseñado para ofrecerte una experiencia fluida y confiable,
+                        asegurando que tu pedido llegue "a todos los nodos de tu paladar", sin importar la demanda.
+                    </p>
+                    <p class="grey-text text-darken-3 lighten-3 flow-text" style="margin-top:15px;">
+                        Este proyecto demuestra cómo la escalabilidad y alta disponibilidad pueden transformar un negocio.
+                    </p>
+                </div>
+                <div class="col s12 m5 center-align hide-on-small-only">
+                    <img src="https://cdn.pixabay.com/photo/2014/04/03/11/54/coffee-312521_1280.png"
+                        alt="Logo Cafetería Gourmet" class="responsive-img" style="max-width: 280px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="parallax-container">
+        <div class="parallax"><img
+                src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1400&q=80"
+                alt="Interior de Cafetería"></div>
+    </div>
+
+    <div class="section" id="productos-destacados" style="background-color: #F1F8F6; padding: 40px 0;">
+        <div class="container">
+            <h2 class="header center-align">Nuestros Favoritos</h2>
+            <div class="row" *ngIf="productosFavoritos.length > 0">
+                <div *ngFor="let producto of productosFavoritos" class="col s12 m6 l4 product-card-container">
+                    <div class="card hoverable product-card">
+                        <div class="card-image image-placeholder">
+                            <img [src]="producto.imagen_url || 'assets/imagenes/default-cafe.png'"
+                                alt="{{ producto.nombre_producto }}">
+                        </div>
+                        <div class="card-content">
+                            <span class="card-title activator grey-text text-darken-4">{{ producto.nombre_producto }}<i
+                                    class="material-icons right">more_vert</i></span>
+                            <p>{{ producto.categoria }}</p>
+                            <p class="truncate" style="min-height: 40px;">{{ producto.descripcion || 'Una delicia de nuestra casa.' }}</p>
+                            <p><strong class="sb-price">{{ producto.precio_unitario | currency:'MXN':'symbol':'1.2-2' }}</strong></p>
+                        </div>
+                        <div class="card-action center-align">
+                            <button (click)="accionProducto(producto)" class="btn waves-effect waves-light brown darken-1">
+                                <i class="material-icons left">add_shopping_cart</i>Pedir
+                            </button>
+                        </div>
+                        <div class="card-reveal">
+                            <span class="card-title grey-text text-darken-4">{{ producto.nombre_producto }}<i
+                                    class="material-icons right">close</i></span>
+                            <p>{{ producto.descripcion || 'Perfecta para cualquier momento del día.' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="productosFavoritos.length === 0" class="center-align">
+                <p class="flow-text">Estamos seleccionando nuestros mejores productos. ¡Vuelve pronto!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="parallax-container">
+        <div class="parallax"><img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1400&q=80"
+                alt="Promoción de Café"></div>
+    </div>
+
+    <div class="section brown lighten-5" id="promocion">
+        <div class="container">
+            <h2 class="header center-align">¡Promoción Especial!</h2>
+            <div class="card-panel brown lighten-4 z-depth-2">
+                <h4 class="center-align">{{ promocionDelDia.titulo }}</h4>
+                <p class="center-align flow-text">{{ promocionDelDia.descripcion }}</p>
+                <p class="center-align grey-text text-darken-1"><em>{{ promocionDelDia.validez }}</em></p>
+                <div class="center-align" style="margin-top: 20px;">
+                    <a (click)="accionProducto()"
+                        class="btn-large waves-effect waves-light amber darken-3 hoverable">¡Aprovecha!</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section white">
+        <div class="container">
+            <h2 class="header center-align">Lo que Dicen Nuestros Clientes</h2>
+            <div class="carousel carousel-slider center" data-indicators="true" style="height: 300px;">
+                <a *ngFor="let testimonio of testimonios; let i = index"
+                    class="carousel-item {{ i % 2 === 0 ? 'brown white-text' : 'amber darken-1 white-text' }}"
+                    [href]="'#testimonio-' + i + '!'">
+                    <div style="padding: 20px;">
+                        <h4>"{{ testimonio.texto }}"</h4>
+                        <p style="font-size: 2.1em; margin-top: 15px;"><em>- {{ testimonio.autor }}</em></p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

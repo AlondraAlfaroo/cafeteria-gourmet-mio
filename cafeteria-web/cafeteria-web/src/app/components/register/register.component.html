@@ -1,0 +1,63 @@
+<div class="container" style="margin-top: 50px;">
+    <div class="row">
+        <div class="col s12 m8 offset-m2 l6 offset-l3">
+            <div class="card sb-login-card">
+                <div class="card-content">
+                    <span class="card-title center-align sb-card-title">Registrarse</span>
+
+                    <br>
+
+                    <div class="center-align" style="margin-bottom: 20px;">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUy9g29EM1_-MDBNADXwDvgLssmfRErQiHug&s"
+                            alt="Gráfico de Reportes" style="max-width: 100px; height: auto;">
+                    </div>
+
+                    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+                        <div class="input-field">
+                            <i class="material-icons prefix sb-icon">person_add</i>
+                            <input id="reg_nombre_completo" type="text" name="nombre_completo"
+                                [(ngModel)]="userData.nombre_completo" required>
+                            <label for="reg_nombre_completo">Nombre Completo</label>
+                        </div>
+                        <div class="input-field">
+                            <i class="material-icons prefix sb-icon">account_circle</i>
+                            <input id="reg_username" type="text" name="username" [(ngModel)]="userData.username"
+                                required>
+                            <label for="reg_username">Usuario</label>
+                        </div>
+                        <div class="input-field">
+                            <i class="material-icons prefix sb-icon">lock</i>
+                            <input id="reg_password" type="password" name="password" [(ngModel)]="userData.password"
+                                required>
+                            <label for="reg_password">Contraseña</label>
+                        </div>
+                        <div class="input-field">
+                            <i class="material-icons prefix sb-icon">lock_outline</i>
+                            <input id="reg_confirm_password" type="password" name="confirm_password"
+                                [(ngModel)]="userData.confirmPassword" required>
+                            <label for="reg_confirm_password">Confirmar Contraseña</label>
+                        </div>
+
+                        <div *ngIf="errorMessage" class="card-panel red lighten-4 red-text text-darken-4"
+                            style="margin-top: 10px; padding: 10px;">
+                            {{ errorMessage }}
+                        </div>
+                        <div *ngIf="successMessage" class="card-panel green lighten-4 green-text text-darken-4"
+                            style="margin-top: 10px; padding: 10px;">
+                            {{ successMessage }}
+                        </div>
+
+                        <div class="card-action center-align" style="margin-top: 20px;">
+                            <button class="btn waves-effect waves-light sb-btn" type="submit"
+                                [disabled]="!registerForm.form.valid">
+                                Registrarme <i class="material-icons right">person_add</i>
+                            </button>
+                            <p style="margin-top: 10px;">¿Ya tienes cuenta?</p>
+                            <a style="text-align: center; color: #00704A; font-weight: 700;" routerLink="/login">Inicia Sesión</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

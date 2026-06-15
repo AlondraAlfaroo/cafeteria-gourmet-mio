@@ -1,0 +1,53 @@
+<div class="container">
+    <h2 class="header center">Nuestro Menú</h2>
+    <div class="row section">
+        <h4 class="sb-section-title">Registrar Nuevo Pedido</h4>
+        <div class="input-field col s12 m6">
+            <select id="sucursal_pedido" [(ngModel)]="nuevoPedido.sucursal_id">
+                <option value="" disabled selected>Elige una sucursal</option>
+                <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}</option>
+            </select>
+            <label for="sucursal_pedido">Sucursal</label>
+        </div>
+        <div class="input-field col s12 m6">
+            <input id="producto_pedido" type="text" [(ngModel)]="nuevoPedido.producto" readonly>
+            <label for="producto_pedido" class="active">Producto Seleccionado</label>
+        </div>
+        <div class="input-field col s12 m3">
+            <input id="cantidad_pedido" type="number" [(ngModel)]="nuevoPedido.cantidad" min="1">
+            <label for="cantidad_pedido" class="active">Cantidad</label>
+        </div>
+        <div class="input-field col s12 m3">
+            <input id="precio_pedido" type="text" [value]="nuevoPedido.precio_unitario | currency" readonly>
+            <label for="precio_pedido" class="active">Precio Unitario</label>
+        </div>
+        <div class="col s12 m6">
+            <button class="btn waves-effect waves-light sb-btn" (click)="registrarPedido()" type="submit" name="action">
+                Registrar Pedido
+                <i class="material-icons right">send</i>
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div *ngFor="let producto of productosDelMenu" class="col s12 m6 l4" style="padding: 30px 5px;">
+            <div class="card sb-product-card">
+                <div class="card-content">
+                    <span class="card-title activator sb-card-name" style="font-weight: 500;">
+                        {{ producto.nombre }}
+                        <i class="material-icons right">more_vert</i>
+                    </span>
+                    <p><a href="#!" (click)="seleccionarProducto(producto)"
+                            class="btn-small sb-card-btn">Seleccionar</a></p>
+                </div>
+                <div class="card-reveal sb-card-reveal">
+                    <span class="card-title grey-text text-darken-4" style="font-size: 2rem; font-weight: 500;">
+                        {{ producto.nombre }}<i class="material-icons right">close</i>
+                    </span>
+                    <p>{{ producto.descripcion || 'Delicioso producto de nuestra cafetería.' }}</p>
+                    <p class="center flow-text sb-card-price">{{ producto.precio_unitario | currency }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+<div class="navbar-fixed">
+    <nav class="brown darken-2">
+        <div class="nav-wrapper container">
+            <a href="#" class="brand-logo">Cafetería Gourmet BASE DE DATOS</a> <a href="#" data-target="mobile-demo"
+                class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a routerLink="/">Home</a></li>
+                <li><a routerLink="/menu">Menú de Pedidos</a></li>
+                <li><a routerLink="/reportes">Reportes</a></li>
+                <li><a routerLink="/login">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
+<ul class="sidenav" id="mobile-demo">
+    <li><a routerLink="/">Home</a></li>
+    <li><a routerLink="/menu">Menú de Pedidos</a></li>
+    <li><a routerLink="/reportes">Reportes</a></li>
+    <li><a routerLink="/login">Login</a></li>
+</ul>
+
+<router-outlet></router-outlet>
+
+<footer class="brown darken-3 page-footer" id="contact">
+    <div class="container">
+        <div class="row">
+            <div class="col l6 s12">
+                <h5 class="white-text">Cafetería Gourmet BASE DE DATOS</h5>
+                <p class="grey-text text-lighten-4">Proyecto Final - Bases de Datos Distribuidas.</p>
+            </div>
+            <div class="col l4 offset-l2 s12">
+                <h5 class="white-text">Enlaces</h5>
+                <ul>
+                    <li><a class="grey-text text-lighten-3" routerLink="/">Home</a></li>
+                    <li><a class="grey-text text-lighten-3" routerLink="/menu">Menú</a></li>
+                    <li><a class="grey-text text-lighten-3" routerLink="/reportes">Reportes</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-copyright">
+        <div class="container">
+            © 2026 Equipo F
+            <a class="grey-text text-lighten-4 right" href="#!">Más Enlaces</a>
+        </div>
+    </div>
+</footer>

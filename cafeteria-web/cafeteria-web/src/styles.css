@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600&display=swap');
+
+html {
+    scroll-behavior: smooth;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Lato', sans-serif;
+    background-color: #F1F8F6;
+    color: #1E3932;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+router-outlet + * {
+    flex: 1;
+}
+
+/* Slider */
+.slider .indicators .indicator-item.active {
+    background-color: #00704A;
+}
+
+.slider .caption h2,
+.slider .caption h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.slider .caption h5 {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    color: #ffffff;
+}
+
+/* Botón principal del slider */
+.slider .btn-large {
+    background-color: #00704A !important;
+    border-radius: 24px !important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+}
+
+.slider .btn-large:hover {
+    background-color: #1E3932 !important;
+}
+
+@keyframes pulse {
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(0,112,74,0.5); }
+    70%  { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(0,112,74,0); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(0,112,74,0); }
+}
+
+.slider .btn-large.hoverable {
+    animation: pulse 2s infinite;
+}
+
+/* Parallax */
+.parallax-container {
+    min-height: 280px;
+    height: auto;
+}
+
+/* Headers globales */
+.header {
+    font-family: 'Playfair Display', serif;
+    color: #1E3932;
+    font-weight: 600;
+}
+
+/* Títulos de card */
+.card-title {
+    font-family: 'Playfair Display', serif;
+    color: #1E3932;
+}
+
+/* Sección about */
+#aboutus p {
+    font-family: 'Lato', sans-serif;
+    color: #1E3932;
+}
+
+/* Carrusel testimonios */
+.carousel-item h4 {
+    font-family: 'Playfair Display', serif;
+}
+
+.carousel-item p {
+    font-family: 'Lato', sans-serif;
+}
+
+/* Footer */
+footer h5 {
+    font-family: 'Playfair Display', serif !important;
+}
+
+footer p, footer li {
+    font-family: 'Lato', sans-serif;
+}
+
+/* Botones globales brown → sb */
+.btn.brown, .btn.brown.darken-1, .btn.brown.darken-2,
+.btn.brown.lighten-1 {
+    background-color: #1E3932 !important;
+    border-radius: 24px !important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+}
+
+.btn.brown:hover, .btn.brown.darken-1:hover,
+.btn.brown.darken-2:hover, .btn.brown.lighten-1:hover {
+    background-color: #00704A !important;
+}
+
+/* Social icons */
+.btn-floating.brown, .btn-floating.brown.darken-2 {
+    background-color: #1E3932 !important;
+    transition: background 0.2s;
+}
+
+.btn-floating.brown:hover, .btn-floating.brown.darken-2:hover {
+    background-color: #00704A !important;
+}
+
+/* Cards globales */
+.card {
+    border-radius: 12px !important;
+    border: 1px solid #D4E9E2;
+    box-shadow: none !important;
+}
+
+.card:hover {
+    box-shadow: 0 8px 24px rgba(30,57,50,0.12) !important;
+}
+
+/* Carousel testimonios colores */
+.carousel-item.brown {
+    background-color: #1E3932 !important;
+}
+
+.carousel-item.amber.darken-1 {
+    background-color: #CBA258 !important;
+}
+
+/* Sección promoción */
+.brown.lighten-5 {
+    background-color: #F1F8F6 !important;
+}
+
+.card-panel.brown.lighten-4 {
+    background-color: #D4E9E2 !important;
+    border-radius: 12px !important;
+    border-left: 4px solid #00704A;
+    box-shadow: none !important;
+}
+
+.card-panel.brown.lighten-4 h4 {
+    color: #1E3932 !important;
+    font-family: 'Playfair Display', serif !important;
+}
+
+.card-panel.brown.lighten-4 p {
+    color: #1E3932 !important;
+}
+
+/* Botón Aprovecha */
+.btn-large.amber.darken-3 {
+    background-color: #CBA258 !important;
+    color: #1E3932 !important;
+    border-radius: 24px !important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 700 !important;
+}
+
+.btn-large.amber.darken-3:hover {
+    background-color: #1E3932 !important;
+    color: #ffffff !important;
+}
+
+/* Responsive */
+@media only screen and (max-width: 600px) {
+    footer .container .row .col {
+        padding: 0 0.5rem !important;
+    }
+    footer h5 {
+        font-size: 1.2rem !important;
+    }
+    footer p, footer li a {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ── NEUTRALIZAR li.active DE MATERIALIZE EN NAVBAR ── */
+nav ul li.active {
+  background-color: transparent !important;
+}
+
+nav ul li.active > a {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #CBA258 !important;
+  border-radius: 0 !important;
+}

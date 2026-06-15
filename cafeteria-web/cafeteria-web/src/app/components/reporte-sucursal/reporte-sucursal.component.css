@@ -1,0 +1,253 @@
+/* ===================================================
+   APP COMPONENT — TEMA STARBUCKS
+   Navbar + Sidenav + Footer
+   Paleta: #1E3932 · #00704A · #D4E9E2 · #CBA258 · #F1F8F6
+   Tipografía: Playfair Display (marca) + Lato (nav/cuerpo)
+   =================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600&display=swap');
+
+/* ── NAVBAR ── */
+.sb-navbar {
+  background-color: #1E3932 !important;
+  border-bottom: 3px solid #00704A;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  font-family: 'Lato', sans-serif;
+}
+
+/* Logo */
+.sb-brand {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  padding-left: 0 !important;
+}
+
+.sb-brand-icon {
+  width: 34px;
+  height: 34px;
+  background: #00704A;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.sb-brand:hover .sb-brand-icon {
+  transform: rotate(15deg) scale(1.08);
+}
+
+.sb-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.sb-brand-main {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+.sb-brand-sub {
+  font-size: 10px;
+  font-weight: 700;
+  color: #D4E9E2;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+/* Links desktop */
+nav ul li a {
+  font-family: 'Lato', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  color: #D4E9E2 !important;
+  border-radius: 20px;
+  padding: 6px 16px !important;
+  transition: background 0.2s ease, color 0.2s ease;
+  line-height: 64px;
+}
+
+nav ul li a:hover {
+  background: rgba(0, 112, 74, 0.3) !important;
+  color: #ffffff !important;
+}
+
+nav ul li a.sb-active {
+  background: #00704A !important;
+  color: #ffffff !important;
+}
+
+/* Botón login con borde */
+nav ul li a.sb-login-btn {
+  border: 1.5px solid rgba(212, 233, 226, 0.4);
+  margin-left: 6px;
+}
+
+nav ul li a.sb-login-btn:hover {
+  background: #CBA258 !important;
+  border-color: #CBA258 !important;
+  color: #1E3932 !important;
+}
+
+/* Hamburguesa */
+.sb-sidenav-trigger {
+  color: #D4E9E2 !important;
+}
+
+/* ── SIDENAV MOBILE ── */
+.sb-sidenav {
+  background: #1E3932 !important;
+  font-family: 'Lato', sans-serif;
+}
+
+.sb-sidenav-header {
+  padding: 0;
+  margin: 0;
+}
+
+.sb-sidenav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid rgba(212, 233, 226, 0.15);
+}
+
+.sb-sidenav-logo span {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.sb-sidenav li a {
+  color: #D4E9E2 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px;
+  padding: 0 20px !important;
+  transition: background 0.2s ease, color 0.2s ease !important;
+}
+
+.sb-sidenav li a i.material-icons {
+  color: #00704A !important;
+  font-size: 20px !important;
+}
+
+.sb-sidenav li a:hover {
+  background: rgba(0, 112, 74, 0.2) !important;
+  color: #ffffff !important;
+}
+
+.sb-divider {
+  background-color: rgba(212, 233, 226, 0.15) !important;
+}
+
+/* ── FOOTER ── */
+.sb-footer {
+  background-color: #1E3932 !important;
+  font-family: 'Lato', sans-serif;
+  margin-top: 40px;
+  border-top: 3px solid #00704A;
+}
+
+.sb-footer-brand {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sb-footer-brand h5 {
+  font-family: 'Playfair Display', serif !important;
+  color: #ffffff !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+}
+
+.sb-footer-desc {
+  color: #D4E9E2 !important;
+  font-size: 13px;
+  opacity: 0.7;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sb-footer-links-title {
+  font-family: 'Playfair Display', serif !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  margin-bottom: 12px !important;
+}
+
+.sb-footer ul {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.sb-footer ul li {
+  margin-bottom: 8px;
+}
+
+.sb-footer ul li a {
+  color: #D4E9E2 !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+  opacity: 0.75;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.sb-footer ul li a:hover {
+  opacity: 1 !important;
+  color: #CBA258 !important;
+}
+
+/* Pie del footer */
+.sb-footer-copy {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border-top: 1px solid rgba(212, 233, 226, 0.1);
+  padding: 14px 0 !important;
+}
+
+.sb-footer-copy .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sb-footer-copy span {
+  color: #D4E9E2;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.sb-footer-copy a {
+  color: #CBA258 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  float: none !important;
+  transition: opacity 0.2s;
+}
+
+.sb-footer-copy a:hover {
+  opacity: 0.8;
+}

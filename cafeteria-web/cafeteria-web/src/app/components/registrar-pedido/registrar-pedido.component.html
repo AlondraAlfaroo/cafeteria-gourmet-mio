@@ -1,0 +1,119 @@
+<div class="container">
+    <h2 class="header center">Registrar Nuevo Pedido</h2>
+
+    <div class="center-align" style="margin-bottom: 20px;">
+        <img src="https://static.vecteezy.com/system/resources/thumbnails/041/281/412/small_2x/coffee-cup-transparent-png.png"
+            alt="Gráfico de Reportes" style="max-width: 250px; height: auto;">
+    </div>
+
+    <div class="row section">
+        <form (ngSubmit)="onSubmitPedido()" #pedidoForm="ngForm">
+            <div class="input-field col s12 m6">
+                <select id="sucursal_pedido_registro" name="sucursal_id_pedido" [(ngModel)]="nuevoPedido.sucursal_id"
+                    required #sucursalDelPedidoSelect>
+                    <option value="" disabled selected>Elige sucursal para el pedido *</option>
+                    <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}</option>
+                </select>
+                <label for="sucursal_pedido_registro">Sucursal del Pedido</label>
+            </div>
+
+            <div class="input-field col s12 m6">
+                <input id="producto_nombre_pedido" name="nombre_producto_pedido" type="text"
+                    [(ngModel)]="nuevoPedido.nombre_producto" readonly required>
+                <label for="producto_nombre_pedido" [class.active]="nuevoPedido.nombre_producto">Producto Seleccionado
+                    *</label>
+            </div>
+
+            <div class="input-field col s12 m4">
+                <input id="categoria_producto_pedido" name="categoria_pedido" type="text"
+                    [(ngModel)]="nuevoPedido.categoria" readonly>
+                <label for="categoria_producto_pedido" [class.active]="nuevoPedido.categoria">Categoría</label>
+            </div>
+
+            <div class="input-field col s12 m4">
+                <input id="precio_unitario_pedido" name="precio_unitario_pedido" type="text"
+                    [value]="nuevoPedido.precio_unitario | currency:'MXN':'symbol':'1.2-2'" readonly>
+                <label for="precio_unitario_pedido" [class.active]="nuevoPedido.precio_unitario > 0">Precio
+                    Unitario</label>
+            </div>
+
+            <div class="input-field col s12 m4">
+                <input id="cantidad_pedido" name="cantidad_pedido" type="number" [(ngModel)]="nuevoPedido.cantidad"
+                    min="1" required>
+                <label for="cantidad_pedido" class="active">Cantidad *</label>
+            </div>
+
+            <div class="col s12" style="margin-top: 20px;">
+                <button class="btn waves-effect waves-light brown darken-2" type="submit"
+                    [disabled]="!pedidoForm.form.valid || !nuevoPedido.producto_id">
+                    Registrar Pedido
+                    <i class="material-icons right">add_shopping_cart</i>
+                </button>
+            </div>
+            <div *ngIf="errorRegistroPedido" class="col s12 error-message" style="margin-top: 15px;">
+                {{ errorRegistroPedido }}
+            </div>
+        </form>
+    </div>
+
+    <hr>
+
+    <div class="row section">
+        <h3 class="header">Menú Disponible</h3>
+        <div class="input-field col s12 m6">
+            <select id="sucursal_menu_select" (change)="onSucursalParaMenuChange($event)" #sucursalMenuSelect>
+                <option value="" disabled selected>Ver menú de la sucursal...</option>
+                <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}</option>
+            </select>
+            <label for="sucursal_menu_select">Mostrar Menú de Sucursal</label>
+        </div>
+
+        <div *ngIf="!sucursalParaMenu && productosDelMenu.length === 0 && !errorCargaProductos" class="col s12">
+            <p>Por favor, selecciona una sucursal para ver su menú.</p>
+        </div>
+
+        <div *ngIf="errorCargaProductos" class="col s12 error-message">
+            <p>{{ errorCargaProductos }}</p>
+        </div>
+    </div>
+
+    <div class="row product-grid">
+        <div *ngIf="sucursalParaMenu && productosDelMenu.length === 0 && !errorCargaProductos" class="col s12">
+            <p>No hay productos en el menú para la Sucursal {{ sucursalParaMenu }} o aún se están cargando.</p>
+        </div>
+
+        <div *ngFor="let producto of productosDelMenu" class="col s12 m6 l4" style="padding: 15px 5px;">
+            <div class="card hoverable same-height-card">
+
+                <div class="card-content">
+                    <span class="card-title activator grey-text text-darken-4">
+                        {{ producto.nombre_producto }} <i class="material-icons right">more_vert</i>
+                    </span>
+                    <p>{{ producto.categoria }}</p>
+                    <p><strong>{{ producto.precio_unitario | currency:'MXN':'symbol':'1.2-2' }}</strong></p>
+                    <p>
+                        <span *ngIf="producto.cantidad_disponible <= 0" class="new badge red"
+                            data-badge-caption="">AGOTADO</span>
+                        <span *ngIf="producto.cantidad_disponible > 0 && producto.cantidad_disponible <= 10"
+                            class="new badge orange" data-badge-caption="">Últimos!
+                            ({{producto.cantidad_disponible}})</span>
+                        <span *ngIf="producto.cantidad_disponible > 10" class="new badge green"
+                            data-badge-caption="">Disp: {{producto.cantidad_disponible}}</span>
+                    </p>
+                </div>
+                <div class="card-action">
+                    <button class="waves-effect waves-light btn brown lighten-1" (click)="seleccionarProducto(producto)"
+                        [disabled]="producto.cantidad_disponible <= 0">
+                        <i class="material-icons left">add_circle_outline</i>Seleccionar
+                    </button>
+                </div>
+                <div class="card-reveal">
+                    <span class="card-title grey-text text-darken-4">{{ producto.nombre_producto }}<i
+                            class="material-icons right">close</i></span>
+                    <p>{{ producto.descripcion || 'Un delicioso producto de nuestra cafetería.' }}</p>
+                    <p>Disponibles: {{ producto.cantidad_disponible }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,192 @@
+<div class="container">
+    <h2 class="header center">Gestión de Usuarios</h2>
+
+    <div class="center-align" style="margin-bottom: 20px; margin-top: 20px;">
+        <img src="https://www.gtfms.com/wp-content/uploads/2025/06/OPERATOR.webp"
+            alt="Gestión de Usuarios"
+            style="max-width: 350px; height: 200px; object-fit: cover; border-radius: 16px;">
+    </div>
+
+    <div class="row">
+        <div class="col s12 center-align">
+            <button class="btn waves-effect waves-light brown darken-1 modal-trigger" data-target="modalUsuario"
+                (click)="abrirModalAltaUsuario()">
+                <i class="material-icons left">person_add</i>Añadir Usuario
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="isLoadingUsuarios" class="progress">
+        <div class="indeterminate"></div>
+    </div>
+
+    <div *ngIf="!isLoadingUsuarios">
+        <h4 class="header">Lista de Usuarios</h4>
+
+        <div class="row" *ngIf="usuarios.length > 0">
+            <div class="col s12">
+                <div class="card-panel grey lighten-4" style="padding: 10px 15px; margin-bottom: 20px;">
+                    <div class="row valign-wrapper" style="margin-bottom: 0;">
+                        <div class="input-field col s12 m3">
+                            <input id="filtro_username_input" type="text" [(ngModel)]="filtroUsername"
+                                (input)="aplicarFiltrosUsuarios()">
+                            <label for="filtro_username_input" [class.active]="filtroUsername.length > 0">Buscar por
+                                Username</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            <input id="filtro_nombre_completo_input" type="text" [(ngModel)]="filtroNombreCompleto"
+                                (input)="aplicarFiltrosUsuarios()">
+                            <label for="filtro_nombre_completo_input"
+                                [class.active]="filtroNombreCompleto.length > 0">Buscar por Nombre</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            <select id="filtro_rol_select" [(ngModel)]="filtroRol" (change)="aplicarFiltrosUsuarios()">
+                                <option value="">Todos los Roles</option>
+                                <option *ngFor="let rol of rolesDisponibles" [value]="rol">{{ rol | titlecase }}
+                                </option>
+                            </select>
+                            <label for="filtro_rol_select">Filtrar por Rol</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            <select id="filtro_sucursal_select" [(ngModel)]="filtroSucursalAsignada"
+                                (change)="aplicarFiltrosUsuarios()">
+                                <option [value]="null">Todas las Sucursales</option>
+                                <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}
+                                </option>
+                            </select>
+                            <label for="filtro_sucursal_select">Filtrar por Sucursal</label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="col s12 center-align">
+                            <button class="btn waves-effect waves-light grey darken-1" (click)="resetFiltrosUsuarios()">
+                                <i class="material-icons left">refresh</i>Limpiar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="striped responsive-table highlight" *ngIf="usuariosFiltrados.length > 0; else noUsuariosTemplate">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Nombre Completo</th>
+                    <th>Rol</th>
+                    <th>Sucursal Asignada</th>
+                    <th style="width: 150px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of usuariosFiltrados">
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.nombre_completo }}</td>
+                    <td>{{ user.rol | titlecase }}</td>
+                    <td>{{ user.sucursal_asignada_id !== null ? 'Sucursal ' + user.sucursal_asignada_id : 'Todas/N/A' }}</td>
+                    <td>
+                        <button class="btn-floating waves-effect waves-light blue modal-trigger" title="Editar Usuario"
+                            data-target="modalUsuario" (click)="abrirModalEdicionUsuario(user)"
+                            style="margin-right: 5px;">
+                            <i class="material-icons">edit</i>
+                        </button>
+                        <button class="btn-floating waves-effect waves-light red" title="Eliminar Usuario"
+                            (click)="eliminarUsuario(user)"
+                            [disabled]="authService.getCurrentUser()?.username === user.username">
+                            <i class="material-icons">delete_forever</i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <ng-template #noUsuariosTemplate>
+            <p *ngIf="!isLoadingUsuarios">No hay usuarios registrados que coincidan con los filtros aplicados.</p>
+        </ng-template>
+    </div>
+
+    <div id="modalUsuario" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h4>{{ esModoEdicionUsuario ? 'Editar Usuario' : 'Añadir Nuevo Usuario' }}</h4>
+            <p *ngIf="esModoEdicionUsuario">Editando usuario: <strong>{{ formUsuario.nombre_completo }}</strong>
+                (Username: {{ formUsuario.username }})</p>
+
+            <form (ngSubmit)="guardarUsuario()" #formUsuarioModal="ngForm">
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="form_username" name="form_username" type="text" [(ngModel)]="formUsuario.username"
+                            required [readonly]="esModoEdicionUsuario" #usernameInput="ngModel">
+                        <label for="form_username" [class.active]="formUsuario.username">Username *</label>
+                        <span class="helper-text red-text"
+                            *ngIf="usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)">
+                            Username es requerido.
+                        </span>
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="form_nombre_completo" name="form_nombre_completo" type="text"
+                            [(ngModel)]="formUsuario.nombre_completo" required #nombreCompletoInput="ngModel">
+                        <label for="form_nombre_completo" [class.active]="formUsuario.nombre_completo">Nombre Completo *</label>
+                        <span class="helper-text red-text"
+                            *ngIf="nombreCompletoInput.invalid && (nombreCompletoInput.dirty || nombreCompletoInput.touched)">
+                            Nombre Completo es requerido.
+                        </span>
+                    </div>
+                    <div class="input-field col s12" *ngIf="!esModoEdicionUsuario">
+                        <input id="form_password" name="form_password" type="password"
+                            [(ngModel)]="formUsuario.password" required #passwordInput="ngModel">
+                        <label for="form_password">Contraseña *</label>
+                        <span class="helper-text red-text"
+                            *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)">
+                            Contraseña es requerida.
+                        </span>
+                    </div>
+                    <div class="input-field col s12" *ngIf="!esModoEdicionUsuario">
+                        <input id="form_confirm_password" name="form_confirm_password" type="password"
+                            [(ngModel)]="formUsuario.confirmPassword" required #confirmPasswordInput="ngModel">
+                        <label for="form_confirm_password">Confirmar Contraseña *</label>
+                        <span class="helper-text red-text"
+                            *ngIf="confirmPasswordInput.invalid && (confirmPasswordInput.dirty || confirmPasswordInput.touched)">
+                            Confirmación de Contraseña es requerida.
+                        </span>
+                        <span class="helper-text red-text"
+                            *ngIf="formUsuario.password !== formUsuario.confirmPassword && confirmPasswordInput.dirty">
+                            Las contraseñas no coinciden.
+                        </span>
+                    </div>
+                    <div class="input-field col s12">
+                        <select id="form_rol" name="form_rol" [(ngModel)]="formUsuario.rol" required
+                            #rolSelect="ngModel" (change)="onRolChange()">
+                            <option value="" disabled [selected]="!formUsuario.rol">Elige un Rol *</option>
+                            <option *ngFor="let rol of rolesDisponibles" [value]="rol">{{ rol | titlecase }}</option>
+                        </select>
+                        <label for="form_rol">Rol *</label>
+                        <span class="helper-text red-text"
+                            *ngIf="rolSelect.invalid && (rolSelect.dirty || rolSelect.touched)">
+                            Rol es requerido.
+                        </span>
+                    </div>
+                    <div class="input-field col s12" *ngIf="formUsuario.rol === 'empleado'">
+                        <select id="form_sucursal_asignada" name="form_sucursal_asignada"
+                            [(ngModel)]="formUsuario.sucursal_asignada_id" [required]="formUsuario.rol === 'empleado'"
+                            #sucursalUsuarioSelect="ngModel">
+                            <option [value]="null" disabled [selected]="formUsuario.sucursal_asignada_id === null">
+                                Selecciona una sucursal *</option>
+                            <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}</option>
+                        </select>
+                        <label for="form_sucursal_asignada">Sucursal Asignada *</label>
+                        <span class="helper-text red-text"
+                            *ngIf="sucursalUsuarioSelect.invalid && (sucursalUsuarioSelect.dirty || sucursalUsuarioSelect.touched)">
+                            Sucursal asignada es requerida para empleados.
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="admin/usuarios" class="modal-close waves-effect waves-grey btn-flat">Cancelar</a>
+            <button class="btn waves-effect waves-light brown darken-2" (click)="guardarUsuario()"
+                [disabled]="!formUsuarioModal.form.valid || ( !esModoEdicionUsuario && (formUsuario.password !== formUsuario.confirmPassword || (formUsuario.password === undefined || formUsuario.password.length < 6)) )">
+                {{ esModoEdicionUsuario ? 'Actualizar Usuario' : 'Guardar Nuevo Usuario' }}
+            </button>
+        </div>
+    </div>
+</div>

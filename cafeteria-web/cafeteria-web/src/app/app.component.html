@@ -1,0 +1,143 @@
+<div class="navbar-fixed">
+  <nav class="sb-navbar">
+    <div class="nav-wrapper container">
+      <a routerLink="/" class="brand-logo sb-brand" style="display: flex; align-items: center;">
+       Cafetería Gourmet </a>
+      <a href="#" data-target="mobile-demo" class="sidenav-trigger sb-sidenav-trigger"><i class="material-icons">menu</i></a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <li><a routerLink="/"><i class="material-icons left">home</i>Home</a></li>
+        <li *ngIf="!currentUser"><a routerLink="/login"><i class="material-icons left">login</i>Login</a></li>
+        <li *ngIf="!currentUser"><a routerLink="/register"><i class="material-icons left">person_add</i>Registrarse</a></li>
+        <li *ngIf="currentUser"><a routerLink="/registrar-pedido"><i class="material-icons left">add_shopping_cart</i>Pedidos</a></li>
+        <li *ngIf="currentUser && (currentUser.rol === 'admin' || currentUser.rol === 'empleado')"><a
+            routerLink="/reportes"><i class="material-icons left">assessment</i>Reportes</a></li>
+        <li *ngIf="currentUser && currentUser.rol === 'admin'">
+          <a routerLink="/admin/productos" (click)="closeSidenav()"><i class="material-icons left">inventory</i>Productos</a>
+        </li>
+        <li *ngIf="currentUser && currentUser.rol === 'admin'">
+          <a routerLink="/admin/usuarios" (click)="closeSidenav()"><i class="material-icons left">group</i>Gestión Usuarios</a>
+        </li>
+        <li *ngIf="currentUser">
+          <a (click)="logout()" style="cursor: pointer;">
+            <i class="material-icons left">logout</i>Logout ({{ currentUser.username }})
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<ul class="sidenav sb-sidenav" id="mobile-demo">
+  <li><a routerLink="/" (click)="closeSidenav()"><i class="material-icons left">home</i>Home</a></li>
+  <ng-container *ngIf="!currentUser">
+    <li><a routerLink="/login" (click)="closeSidenav()"><i class="material-icons left">login</i>Login</a></li>
+    <li><a routerLink="/register" (click)="closeSidenav()"><i class="material-icons left">person_add</i>Registrarse</a></li>
+  </ng-container>
+  <ng-container *ngIf="currentUser">
+    <li><a routerLink="/registrar-pedido" (click)="closeSidenav()"><i class="material-icons left">add_shopping_cart</i>Pedidos</a></li>
+    <li *ngIf="currentUser.rol === 'empleado' || currentUser.rol === 'admin'"><a routerLink="/reportes"
+        (click)="closeSidenav()"><i class="material-icons left">assessment</i>Reportes</a></li>
+    <li><a (click)="logout(); closeSidenav()" style="cursor: pointer;"><i class="material-icons left">logout</i>Logout</a></li>
+  </ng-container>
+</ul>
+
+<main class="container"
+  style="margin-top: 20px; margin-bottom: 20px; min-height: calc(100vh - 128px); display: flex; flex-direction: column;">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- ── FOOTER MEJORADO ── -->
+<footer class="sb-footer page-footer" id="contact">
+
+  <!-- Franja superior con frase -->
+  <div class="sb-footer-top">
+    <div class="container">
+      <div class="sb-footer-tagline">
+        <span class="sb-footer-leaf">☕</span>
+        <span>Cada taza cuenta una historia</span>
+        <span class="sb-footer-leaf">☕</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cuerpo principal -->
+  <div class="sb-footer-body">
+    <div class="container">
+      <div class="row">
+
+        <!-- Columna 1: Marca -->
+        <div class="col l4 s12 sb-footer-col">
+          <div class="sb-footer-brand-block">
+            <h5 class="sb-footer-title">Cafetería Gourmet</h5>
+            <div class="sb-footer-divider"></div>
+            <p class="sb-footer-desc">
+              Fusionamos la pasión por el café de especialidad con tecnología de bases de datos distribuidas.
+              Proyecto Final ISC — UAA.
+            </p>
+          </div>
+        </div>
+
+        <!-- Columna 2: Navegación -->
+        <div class="col l4 s12 sb-footer-col">
+          <h6 class="sb-footer-subtitle">Navegación</h6>
+          <div class="sb-footer-divider"></div>
+          <ul class="sb-footer-links">
+            <li>
+              <a routerLink="/">
+                <i class="material-icons">home</i>
+                <span>Home</span>
+              </a>
+            </li>
+            <li>
+              <a routerLink="/registrar-pedido">
+                <i class="material-icons">add_shopping_cart</i>
+                <span>Pedidos</span>
+              </a>
+            </li>
+            <li>
+              <a routerLink="/reportes">
+                <i class="material-icons">assessment</i>
+                <span>Reportes</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Columna 3: Horario y contacto -->
+        <div class="col l4 s12 sb-footer-col">
+          <h6 class="sb-footer-subtitle">Horario</h6>
+          <div class="sb-footer-divider"></div>
+          <ul class="sb-footer-info">
+            <li>
+              <i class="material-icons">schedule</i>
+              <span>Lunes – Viernes: 7:00 AM – 9:00 PM</span>
+            </li>
+            <li>
+              <i class="material-icons">schedule</i>
+              <span>Sábado – Domingo: 8:00 AM – 8:00 PM</span>
+            </li>
+            <li>
+              <i class="material-icons">location_on</i>
+              <span>Aguascalientes, México</span>
+            </li>
+            <li>
+              <i class="material-icons">mail_outline</i>
+              <span>contacto&#64;cafeteriagourmet.mx</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Pie del footer -->
+  <div class="footer-copyright sb-footer-copy">
+    <div class="container sb-footer-copy-inner">
+      <span>© 2026 Cafetería Gourmet — Equipo F</span>
+      <span class="sb-footer-copy-sep">·</span>
+      <span>Bases de Datos Distribuidas</span>
+    </div>
+  </div>
+
+</footer>

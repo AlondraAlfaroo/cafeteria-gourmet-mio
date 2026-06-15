@@ -1,0 +1,10 @@
+{
+    "buildCommand": "npm install --legacy-peer-deps && npm run build",
+    "outputDirectory": "dist/cafeteria-web/browser/browser",
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}

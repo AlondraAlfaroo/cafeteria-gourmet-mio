@@ -1,0 +1,209 @@
+<div class="container">
+    <h2 class="header center">Reportes de Pedidos
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTD2B8P046g6kWej8QhfkO7oydAn87-jkmH5CSxT5HoWg&s=10" alt="Gráfico de Reportes"
+            style="height: 40px; vertical-align: middle; margin-left: 10px;">
+    </h2>
+
+    <div class="row section" *ngIf="puedeSeleccionarSucursal">
+        <div class="input-field col s12 m8 l6">
+            <select id="sucursal_reporte_select" (change)="onSucursalParaReporteChange($event)"
+                [(ngModel)]="sucursalSeleccionadaParaReporte" name="sucursal_reporte">
+                <option value="" disabled [selected]="sucursalSeleccionadaParaReporte === null">
+                    Selecciona una sucursal para ver su reporte...
+                </option>
+                <option *ngFor="let id of sucursalesDisponibles" [value]="id">
+                    Sucursal {{ id }}
+                </option>
+            </select>
+            <label for="sucursal_reporte_select" *ngIf="!sucursalSeleccionadaParaReporte">
+                Ver Reporte de Sucursal
+            </label>
+        </div>
+    </div>
+
+    <div *ngIf="!puedeSeleccionarSucursal && currentUser && currentUser.rol === 'empleado' && currentUser.sucursal_asignada_id !== null"
+        class="section">
+        <h4>Reporte para tu Sucursal Asignada: Sucursal {{ currentUser.sucursal_asignada_id }}</h4>
+    </div>
+
+    <div *ngIf="puedeSeleccionarSucursal && sucursalSeleccionadaParaReporte === null && !errorReporte && sucursalesDisponibles.length > 0"
+        class="card-panel teal lighten-5">
+        <i class="material-icons left">info_outline</i> Por favor, selecciona una sucursal de la lista de arriba.
+    </div>
+
+    <div *ngIf="cargandoReporte" class="progress" style="margin-top: 20px;">
+        <div class="indeterminate"></div>
+    </div>
+
+    <div *ngIf="errorReporte" class="card-panel red lighten-4 red-text text-darken-4" style="margin-top: 20px;">
+        {{ errorReporte }}
+    </div>
+
+    <div class="row"
+        *ngIf="mostrarEstadisticas && estadisticas && sucursalSeleccionadaParaReporte !== null && !cargandoReporte && !errorReporte">
+        <h4 class="center-align" style="margin-top: 30px;">Estadísticas de Pedidos -
+            Sucursal {{ sucursalSeleccionadaParaReporte }}</h4>
+
+        <div class="col s12 m4" style="margin-top: 20px;">
+            <div class="card">
+                <div class="card-content center-align">
+                    <h5 class="blue-text">{{ estadisticas.totalVentas | currency:'MXN':'symbol':'1.2-2' }}</h5>
+                    <p>Total en Ventas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m4" style="margin-top: 20px;">
+            <div class="card">
+                <div class="card-content center-align">
+                    <h5 class="green-text">{{ estadisticas.totalPedidos }}</h5>
+                    <p>Total de Pedidos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m4" style="margin-top: 20px;">
+            <div class="card">
+                <div class="card-content center-align">
+                    <h5 class="orange-text">{{ estadisticas.promedioVentaPorPedido | currency:'MXN':'symbol':'1.2-2' }}</h5>
+                    <p>Promedio por Pedido</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col s12 l4" style="margin-top: 20px;">
+            <div class="card">
+                <div class="card-content" style="height: 300px; overflow-y: auto;">
+                    <h6 class="center-align">Ventas por Categoría</h6>
+                    <div class="chart-container-css">
+                        <div *ngIf="chartVentasPorCategoriaData.length === 0" class="no-data-message">No hay datos de ventas por categoría.</div>
+                        <div *ngFor="let item of chartVentasPorCategoriaData" class="chart-item-css">
+                            <span class="chart-label-css">{{ item.label }}</span>
+                            <div class="chart-bar-row">
+                                <div class="chart-bar-track">
+                                    <div class="chart-bar-css" [style.width.%]="item.percentage" [style.background-color]="item.color"></div>
+                                </div>
+                                <span class="chart-value-css">{{ item.value | currency:'MXN':'symbol':'1.2-2' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col s12 l4" style="margin-top: 20px;">
+            <div class="card">
+                <div class="card-content" style="height: 300px; overflow-y: auto;">
+                    <h6 class="center-align">Top 10 Productos más Vendidos</h6>
+                    <div class="chart-container-css">
+                        <div *ngIf="chartVentasPorProductoData.length === 0" class="no-data-message">No hay datos de ventas por producto.</div>
+                        <div *ngFor="let item of chartVentasPorProductoData" class="chart-item-css">
+                            <span class="chart-label-css">{{ item.label }}</span>
+                            <div class="chart-bar-row">
+                                <div class="chart-bar-track">
+                                    <div class="chart-bar-css" [style.width.%]="item.percentage" style="background-color: #1E3932;"></div>
+                                </div>
+                                <span class="chart-value-css">{{ item.value | currency:'MXN':'symbol':'1.2-2' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col s12 l4" style="margin-top: 20px;">
+            <div class="card">
+                <div class="card-content" style="height: 300px; overflow-y: auto;">
+                    <h6 class="center-align">Ventas por Mes</h6>
+                    <div class="chart-container-css">
+                        <div *ngIf="chartVentasPorMesData.length === 0" class="no-data-message">No hay datos de ventas por mes.</div>
+                        <div *ngFor="let item of chartVentasPorMesData" class="chart-item-css">
+                            <span class="chart-label-css">{{ item.label }}</span>
+                            <div class="chart-bar-row">
+                                <div class="chart-bar-track">
+                                    <div class="chart-bar-css" [style.width.%]="item.percentage" style="background-color: #CBA258;"></div>
+                                </div>
+                                <span class="chart-value-css">{{ item.value | currency:'MXN':'symbol':'1.2-2' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr *ngIf="sucursalSeleccionadaParaReporte !== null && !cargandoReporte && !errorReporte && pedidosFiltrados.length > 0">
+
+    <div class="row"
+        *ngIf="pedidosDelReporte.length > 0 && sucursalSeleccionadaParaReporte !== null && !cargandoReporte">
+        <div class="col s12">
+            <div class="card-panel grey lighten-4" style="padding: 10px 15px; margin-bottom: 20px;">
+                <div class="row valign-wrapper" style="margin-bottom: 0;">
+                    <div class="input-fieldd col s12 m2" style="margin-top: 0;">
+                        <select id="filtro_producto_select" [(ngModel)]="filtroProducto"
+                            (change)="aplicarFiltrosYActualizar()">
+                            <option value="">Producto</option>
+                            <option *ngFor="let producto of productosDisponibles" [value]="producto">{{ producto }}</option>
+                        </select>
+                    </div>
+                    <div class="input-fieldd col s12 m2" style="margin-top: 0;">
+                        <select id="filtro_categoria_select" [(ngModel)]="filtroCategoria"
+                            (change)="aplicarFiltrosYActualizar()">
+                            <option value="">Categoría</option>
+                            <option *ngFor="let categoria of categoriasDisponibles" [value]="categoria">{{ categoria }}</option>
+                        </select>
+                    </div>
+                    <div class="col s12 m2" style="margin-top: 0;">
+                        <input id="filtro_usuario_input" type="text" [(ngModel)]="filtroUsuario"
+                            (input)="aplicarFiltrosYActualizar()"
+                            placeholder="Usuario"
+                            class="sb-filtro-usuario-input">
+                        <label for="filtro_usuario_input" [class.active]="filtroUsuario.length > 0"
+                            style="top: 0.8rem !important; left: 0.75rem !important;">
+                        </label>
+                    </div>
+                    <div class="input-fieldd col s12 m2" style="margin-top: 0;">
+                        <select id="orden_precio_select" [(ngModel)]="ordenPrecio"
+                            (change)="aplicarFiltrosYActualizar()">
+                            <option value="">Precio</option>
+                            <option value="asc">Menor a Mayor</option>
+                            <option value="desc">Mayor a Menor</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!cargandoReporte && !errorReporte && pedidosFiltrados.length > 0">
+        <h5 style="margin-top: 30px;">Detalle de Pedidos - Sucursal {{ sucursalSeleccionadaParaReporte }}</h5>
+        <table class="striped responsive-table highlight">
+            <thead>
+                <tr>
+                    <th>ID Pedido</th>
+                    <th>Fecha y Hora</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="right-align">Cantidad</th>
+                    <th class="right-align">Total</th>
+                    <th>Usuario</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let pedido of pedidosFiltrados">
+                    <td>{{ pedido.pedido_id }}</td>
+                    <td>{{ pedido.fecha_pedido | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                    <td>{{ pedido.producto }}</td>
+                    <td>{{ pedido.categoria }}</td>
+                    <td class="right-align">{{ pedido.cantidad }}</td>
+                    <td class="right-align">{{ pedido.total | currency:'MXN':'symbol':'1.2-2' }}</td>
+                    <td>{{ pedido.username }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="!cargandoReporte && !errorReporte && sucursalSeleccionadaParaReporte !== null && pedidosFiltrados.length === 0"
+        style="margin-top: 20px;">
+        <p class="card-panel blue-grey lighten-5">No hay pedidos registrados para la Sucursal {{
+            sucursalSeleccionadaParaReporte }} que coincidan con los filtros aplicados.</p>
+    </div>
+</div>
