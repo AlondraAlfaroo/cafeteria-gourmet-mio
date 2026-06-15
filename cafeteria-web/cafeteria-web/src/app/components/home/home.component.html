@@ -68,17 +68,11 @@
                     </p>
                 </div>
                 <div class="col s12 m5 center-align hide-on-small-only">
-                    <img src="https://cdn.pixabay.com/photo/2014/04/03/11/54/coffee-312521_1280.png"
+                    <img src="https://cdn.pixabay.com/photo/2022/03/09/05/05/coffee-7057030_1280.png"
                         alt="Logo Cafetería Gourmet" class="responsive-img" style="max-width: 280px;">
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="parallax-container">
-        <div class="parallax"><img
-                src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1400&q=80"
-                alt="Interior de Cafetería"></div>
     </div>
 
     <div class="section" id="productos-destacados" style="background-color: #F1F8F6; padding: 40px 0;">
@@ -117,9 +111,12 @@
         </div>
     </div>
 
-    <div class="parallax-container">
-        <div class="parallax"><img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1400&q=80"
-                alt="Promoción de Café"></div>
+ <div class="sb-banner-section">
+        <div class="sb-banner-overlay"></div>
+        <div class="sb-banner-content">
+            <h3 class="sb-banner-title">Calidad en Cada Taza</h3>
+            <p class="sb-banner-sub">Granos seleccionados · Baristas expertos · Experiencia única</p>
+        </div>
     </div>
 
     <div class="section brown lighten-5" id="promocion">
@@ -137,18 +134,21 @@
         </div>
     </div>
 
-    <div class="section white">
+    <div class="section sb-testimonios-section">
         <div class="container">
             <h2 class="header center-align">Lo que Dicen Nuestros Clientes</h2>
-            <div class="carousel carousel-slider center" data-indicators="true" style="height: 300px;">
-                <a *ngFor="let testimonio of testimonios; let i = index"
-                    class="carousel-item {{ i % 2 === 0 ? 'brown white-text' : 'amber darken-1 white-text' }}"
-                    [href]="'#testimonio-' + i + '!'">
-                    <div style="padding: 20px;">
-                        <h4>"{{ testimonio.texto }}"</h4>
-                        <p style="font-size: 2.1em; margin-top: 15px;"><em>- {{ testimonio.autor }}</em></p>
+
+            <div class="sb-testimonios-grid">
+                <div *ngFor="let testimonio of testimonios; let i = index"
+                     class="sb-testimonio-card {{ i === 1 ? 'sb-testimonio-gold' : '' }}">
+                    <div class="sb-testimonio-comilla">"</div>
+                    <p class="sb-testimonio-texto">{{ testimonio.texto }}</p>
+                    <div class="sb-testimonio-autor">
+                        <div class="sb-testimonio-linea"></div>
+                        <span>{{ testimonio.autor }}</span>
+                        <div class="sb-testimonio-linea"></div>
                     </div>
-                </a>
+                </div>
             </div>
         </div>
     </div>

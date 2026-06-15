@@ -22,6 +22,7 @@ export const routes: Routes = [
         component: GestionUsuariosComponent,
         canActivate: [adminAuthGuard] // Protegida por el guard de admin
     },
+    
     { path: 'registrar-pedido', component: RegistrarPedidoComponent, canActivate: [authGuard] }, // <--- DESCOMENTA Y APLICA
     { path: 'reportes', component: ReportesComponent, canActivate: [authGuard] }, // <--- DESCOMENTA Y APLICA
     { path: 'login', component: LoginComponent },

@@ -111,7 +111,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       const sliderElems = this.elementRef.nativeElement.querySelectorAll('.slider');
       if (sliderElems.length > 0) {
-        M.Slider.init(sliderElems, { indicators: true, height: 450, duration: 500, interval: 6000 });
+        M.Slider.init(sliderElems, { indicators: true, height: 580, duration: 700, interval: 5000 });
       }
 
       const parallaxElems = this.elementRef.nativeElement.querySelectorAll('.parallax');
@@ -121,7 +121,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const carouselElems = this.elementRef.nativeElement.querySelectorAll('.carousel.carousel-slider');
       if (carouselElems.length > 0) {
-        M.Carousel.init(carouselElems, { fullWidth: true, indicators: true, duration: 200 });
+        M.Carousel.init(carouselElems, { fullWidth: true, indicators: true, duration: 400 });
       }
       this.cdr.detectChanges();
     }, 250);
