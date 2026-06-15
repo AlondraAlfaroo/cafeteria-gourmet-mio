@@ -56,24 +56,23 @@ nav ul li > a.active {
 
 .sb-sidenav-trigger { color: #D4E9E2 !important; }
 
-/* En pantallas donde se juntan, ocultar texto y dejar solo íconos */
-@media only screen and (max-width: 1350px) {
-  .sb-brand {
-    font-size: 1.2rem !important;
-  }
+/* Pantalla full admin — reducir pero mantener texto */
+@media only screen and (max-width: 1400px) and (min-width: 993px) {
+  .sb-brand { font-size: 1.1rem !important; }
   nav ul li a {
-    font-size: 0px !important;  /* oculta el texto */
+    font-size: 10px !important;
     padding: 0 6px !important;
+    letter-spacing: 0 !important;
   }
   nav ul li a i.material-icons.left {
-    font-size: 18px !important;
-    margin-right: 0 !important;
+    font-size: 13px !important;
+    margin-right: 2px !important;
   }
 }
 
-@media only screen and (max-width: 1500px) and (min-width: 1351px) {
-  .sb-brand { font-size: 1.2rem !important; }
-  nav ul li a { font-size: 10px !important; padding: 0 6px !important; }
+/* Solo ocultar texto en pantallas muy pequeñas donde Materialize ya muestra sidenav */
+@media only screen and (max-width: 992px) {
+  nav ul#nav-mobile { display: none !important; }
 }
 
 /* ── SIDENAV ── */

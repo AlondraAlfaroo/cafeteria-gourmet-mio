@@ -30,22 +30,26 @@
     </div>
 
     <div class="row">
-        <div *ngFor="let producto of productosDelMenu" class="col s12 m6 l4" style="padding: 30px 5px;">
+        <div *ngFor="let producto of productosDelMenu" class="col s12 m6 l4" style="padding: 12px 8px;">
             <div class="card sb-product-card">
                 <div class="card-content">
-                    <span class="card-title activator sb-card-name" style="font-weight: 500;">
+                    <span class="card-title activator sb-card-name">
                         {{ producto.nombre }}
-                        <i class="material-icons right">more_vert</i>
+                        <i class="material-icons right" style="color: #6B7280; font-size: 20px;">more_vert</i>
                     </span>
-                    <p><a href="#!" (click)="seleccionarProducto(producto)"
-                            class="btn-small sb-card-btn">Seleccionar</a></p>
+                    <p>{{ producto.categoria }}</p>
+                    <p>{{ producto.precio_unitario | currency }}</p>
+                    <a href="#!" (click)="seleccionarProducto(producto)" class="sb-card-btn">
+                        <i class="material-icons" style="font-size:14px; vertical-align:middle; margin-right:4px;">add_circle_outline</i>
+                        Seleccionar
+                    </a>
                 </div>
                 <div class="card-reveal sb-card-reveal">
-                    <span class="card-title grey-text text-darken-4" style="font-size: 2rem; font-weight: 500;">
+                    <span class="card-title" style="font-size: 1.2rem; font-weight: 600;">
                         {{ producto.nombre }}<i class="material-icons right">close</i>
                     </span>
                     <p>{{ producto.descripcion || 'Delicioso producto de nuestra cafetería.' }}</p>
-                    <p class="center flow-text sb-card-price">{{ producto.precio_unitario | currency }}</p>
+                    <p class="center sb-card-price">{{ producto.precio_unitario | currency }}</p>
                 </div>
             </div>
         </div>

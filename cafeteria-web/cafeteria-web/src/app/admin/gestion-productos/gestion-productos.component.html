@@ -114,9 +114,9 @@
                         </button>
                         <button class="btn-floating waves-effect waves-light"
                             [title]="producto.esta_activo ? 'Desactivar Producto' : 'Activar Producto'"
-                            [ngClass]="{'red': producto.esta_activo, 'green': !producto.esta_activo}"
+                           [ngClass]="{'green': producto.esta_activo, 'red': !producto.esta_activo}"
                             (click)="cambiarEstado(producto)">
-                            <i class="material-icons">{{ producto.esta_activo ? 'visibility_off' : 'visibility' }}</i>
+                           <i class="material-icons">{{ producto.esta_activo ? 'visibility' : 'visibility_off' }}</i>
                         </button>
                     </td>
                 </tr>

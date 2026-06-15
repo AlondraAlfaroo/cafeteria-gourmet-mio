@@ -4,22 +4,22 @@
             style="height: 40px; vertical-align: middle; margin-left: 10px;">
     </h2>
 
-    <div class="row section" *ngIf="puedeSeleccionarSucursal">
-        <div class="input-field col s12 m8 l6">
-            <select id="sucursal_reporte_select" (change)="onSucursalParaReporteChange($event)"
-                [(ngModel)]="sucursalSeleccionadaParaReporte" name="sucursal_reporte">
-                <option value="" disabled [selected]="sucursalSeleccionadaParaReporte === null">
-                    Selecciona una sucursal para ver su reporte...
-                </option>
-                <option *ngFor="let id of sucursalesDisponibles" [value]="id">
-                    Sucursal {{ id }}
-                </option>
-            </select>
-            <label for="sucursal_reporte_select" *ngIf="!sucursalSeleccionadaParaReporte">
-                Ver Reporte de Sucursal
-            </label>
-        </div>
+   <div class="row section" *ngIf="puedeSeleccionarSucursal">
+    <div class="input-field col s12">
+        <select id="sucursal_reporte_select" (change)="onSucursalParaReporteChange($event)"
+            [(ngModel)]="sucursalSeleccionadaParaReporte" name="sucursal_reporte">
+            <option value="" disabled [selected]="sucursalSeleccionadaParaReporte === null">
+                Selecciona una sucursal para ver su reporte...
+            </option>
+            <option *ngFor="let id of sucursalesDisponibles" [value]="id">
+                Sucursal {{ id }}
+            </option>
+        </select>
+        <label for="sucursal_reporte_select" *ngIf="!sucursalSeleccionadaParaReporte">
+            Ver Reporte de Sucursal
+        </label>
     </div>
+</div>
 
     <div *ngIf="!puedeSeleccionarSucursal && currentUser && currentUser.rol === 'empleado' && currentUser.sucursal_asignada_id !== null"
         class="section">
@@ -27,9 +27,9 @@
     </div>
 
     <div *ngIf="puedeSeleccionarSucursal && sucursalSeleccionadaParaReporte === null && !errorReporte && sucursalesDisponibles.length > 0"
-        class="card-panel teal lighten-5">
-        <i class="material-icons left">info_outline</i> Por favor, selecciona una sucursal de la lista de arriba.
-    </div>
+    class="card-panel teal lighten-5">
+    <i class="material-icons left">info_outline</i> Por favor, selecciona una sucursal de la lista de arriba.
+</div>
 
     <div *ngIf="cargandoReporte" class="progress" style="margin-top: 20px;">
         <div class="indeterminate"></div>

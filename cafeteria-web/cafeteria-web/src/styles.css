@@ -213,3 +213,122 @@ nav ul li.active > a {
   border-bottom: 2px solid #CBA258 !important;
   border-radius: 0 !important;
 }
+
+/* === BOTONES DE ACCIÓN EN TABLAS (gestion-productos, gestion-usuarios) === */
+.btn-floating {
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  box-shadow: none !important;
+  margin: 2px !important;
+}
+
+.btn-floating i {
+  font-size: 16px !important;
+  line-height: 32px !important;
+}
+
+/* Colores Starbucks para los botones */
+.btn-floating.blue {
+  background-color: #1E3932 !important;
+}
+
+.btn-floating.blue:hover {
+  background-color: #00704A !important;
+  box-shadow: 0 2px 8px rgba(0,112,74,0.4) !important;
+}
+
+.btn-floating.orange {
+  background-color: #CBA258 !important;
+}
+
+.btn-floating.orange:hover {
+  background-color: #b8903e !important;
+  box-shadow: 0 2px 8px rgba(203,162,88,0.4) !important;
+}
+
+.btn-floating.red {
+  background-color: #DC2626 !important;
+}
+
+.btn-floating.red:hover {
+  background-color: #991B1B !important;
+  box-shadow: 0 2px 8px rgba(220,38,38,0.4) !important;
+}
+
+.btn-floating.green {
+  background-color: #00704A !important;
+}
+
+.btn-floating.green:hover {
+  background-color: #1E3932 !important;
+}
+
+/* Celda de acciones — alinear botones en fila */
+table td:last-child {
+  white-space: nowrap;
+}
+
+table td:last-child .btn-floating {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+}
+
+/* === BADGE DE ESTADO EN TABLA === */
+.new.badge.green {
+  background-color: #00704A !important;
+  border-radius: 12px !important;
+  font-family: 'Lato', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  padding: 0 10px !important;
+}
+
+.new.badge.red {
+  background-color: #DC2626 !important;
+  border-radius: 12px !important;
+  font-family: 'Lato', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  padding: 0 10px !important;
+}
+
+/* === BOTÓN ACTIVAR/DESACTIVAR — más intuitivo === */
+
+/* Producto ACTIVO → botón gris oscuro "desactivar" (no tan agresivo como rojo) */
+.btn-floating.red {
+  background-color: #6B7280 !important;
+}
+
+.btn-floating.red:hover {
+  background-color: #DC2626 !important;
+  box-shadow: 0 2px 8px rgba(220,38,38,0.4) !important;
+}
+
+/* Producto INACTIVO → botón verde "activar" */
+.btn-floating.green {
+  background-color: #00704A !important;
+}
+
+.btn-floating.green:hover {
+  background-color: #1E3932 !important;
+  box-shadow: 0 2px 8px rgba(0,112,74,0.4) !important;
+}
+
+/* === RESTAURAR COLORES BOTONES FLOTANTES === */
+.btn-floating.green {
+  background-color: #00704A !important;
+}
+.btn-floating.green:hover {
+  background-color: #1E3932 !important;
+}
+.btn-floating.red {
+  background-color: #DC2626 !important;
+}
+.btn-floating.red:hover {
+  background-color: #991B1B !important;
+}

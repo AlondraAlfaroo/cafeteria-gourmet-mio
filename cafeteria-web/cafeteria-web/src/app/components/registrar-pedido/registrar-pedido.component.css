@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600&display=swap');
+
+/* === CONTENEDOR === */
+.container {
+    font-family: 'Lato', sans-serif;
+    color: #1E3932;
+}
+
+/* === ENCABEZADO === */
+.header {
+    font-family: 'Playfair Display', serif !important;
+    color: #1E3932 !important;
+    font-size: 3.5rem !important;
+    font-weight: 600 !important;
+    padding-bottom: 14px;
+    position: relative;
+}
+
+.header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #00704A;
+    border-radius: 2px;
+    margin: 10px auto 0;
+}
+
+/* === FORMULARIO === */
+.input-field input:focus,
+.input-field input[type=text]:focus,
+.input-field input[type=number]:focus {
+    border-bottom: 1px solid #00704A !important;
+    box-shadow: 0 1px 0 0 #00704A !important;
+}
+
+.input-field label { color: #6B7280 !important; }
+.input-field input:focus + label,
+.input-field label.active { color: #00704A !important; }
+
+/* Botón Registrar Pedido */
+.btn.brown.darken-2 {
+    background-color: #1E3932 !important;
+    border-radius: 24px !important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+}
+
+.btn.brown.darken-2:hover {
+    background-color: #00704A !important;
+}
+
+/* === HR === */
+hr {
+    border: none;
+    border-top: 1px solid #D4E9E2;
+    margin: 28px 0;
+}
+
+/* === GRID DE PRODUCTOS === */
+.product-grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: stretch !important;
+}
+
+.product-grid .col {
+    display: flex !important;
+    padding: 10px 8px !important;
+}
+
+/* === TARJETA DE PRODUCTO === */
+.same-height-card {
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    border: 1px solid #D4E9E2 !important;
+    box-shadow: 0 2px 8px rgba(30,57,50,0.06) !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+    overflow: hidden !important;
+    position: relative !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.same-height-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 28px rgba(30,57,50,0.13) !important;
+    border-color: #00704A !important;
+}
+
+/* card-content */
+.same-height-card .card-content {
+    padding: 18px 18px 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+}
+
+/* Nombre del producto */
+.same-height-card .card-content .card-title {
+    font-family: 'Playfair Display', serif !important;
+    color: #1E3932 !important;
+    font-size: 1.1rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    min-height: 48px !important;
+}
+
+/* Categoría */
+.same-height-card .card-content p:nth-child(1) {
+    font-family: 'Lato', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    color: #6B7280 !important;
+    margin: 0 0 4px !important;
+}
+
+/* Precio */
+.same-height-card .card-content p:nth-child(2) strong {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.15rem !important;
+    font-weight: 600 !important;
+    color: #00704A !important;
+}
+
+/* Badge disponibilidad */
+.same-height-card .card-content p:nth-child(3) {
+    margin-top: auto !important;
+    padding-top: 8px !important;
+}
+
+.same-height-card .new.badge.green {
+    background-color: #D4E9E2 !important;
+    color: #1E3932 !important;
+    border-radius: 12px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+}
+
+.same-height-card .new.badge.orange {
+    background-color: #FEF3C7 !important;
+    color: #92400E !important;
+    border-radius: 12px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+}
+
+.same-height-card .new.badge.red {
+    background-color: #FEE2E2 !important;
+    color: #991B1B !important;
+    border-radius: 12px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+}
+
+/* === BOTÓN SELECCIONAR === */
+.same-height-card .card-action {
+    padding: 12px 18px !important;
+    border-top: 1px solid #F1F8F6 !important;
+    background: #ffffff !important;
+}
+
+.same-height-card .card-action .btn {
+    background-color: #1E3932 !important;
+    border-radius: 22px !important;
+    font-family: 'Lato', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 40px !important;
+    box-shadow: none !important;
+}
+
+.same-height-card .card-action .btn:hover:not([disabled]) {
+    background-color: #00704A !important;
+}
+
+.same-height-card .card-action .btn[disabled] {
+    background-color: #E5E7EB !important;
+    color: #9CA3AF !important;
+    cursor: not-allowed !important;
+}
+
+/* === CARD REVEAL === */
+.same-height-card .card-reveal {
+    background: #1E3932 !important;
+    padding: 20px !important;
+}
+
+.same-height-card .card-reveal .card-title {
+    color: #ffffff !important;
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.1rem !important;
+}
+
+.same-height-card .card-reveal p {
+    color: #D4E9E2 !important;
+    font-family: 'Lato', sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+/* === ERROR === */
+.error-message {
+    color: #991B1B;
+    background: #FEE2E2;
+    border-left: 4px solid #DC2626;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+}
