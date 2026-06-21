@@ -12,9 +12,11 @@ services:
     environment:
       - CASSANDRA_CLUSTER_NAME=CafeteriaCluster # Mantén el mismo nombre de clúster
       # Semillas: los 3 nombres de servicio locales + IP de MaquinaB
-      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3,${IP_MAQUINA_B}
+      # - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3,${IP_MAQUINA_B} # Descomentar cuando MaquinaB esté disponible
+      - CASSANDRA_SEEDS=cassandra-node1 # node1 arranca primero (node2/node3 dependen de que esté healthy), así que solo puede semillarse a sí mismo
       - CASSANDRA_LISTEN_ADDRESS=cassandra-node1
-      - CASSANDRA_BROADCAST_ADDRESS=${IP_MAQUINA_A}    # ¡CRÍTICO! Anuncia IP_MAQUINA_A para MaquinaB
+      # - CASSANDRA_BROADCAST_ADDRESS=${IP_MAQUINA_A} # Descomentar (junto con la línea de abajo) cuando MaquinaB esté disponible
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra-node1    # Mientras tanto, igual que LISTEN_ADDRESS (mismo criterio que node2/node3)
       - CASSANDRA_RPC_ADDRESS=0.0.0.0
       - CASSANDRA_BROADCAST_RPC_ADDRESS=${IP_MAQUINA_A}
       - CASSANDRA_DC=DC1

@@ -126,6 +126,34 @@ flowchart TB
     N2 <-->|Gossip protocol| N3
 ```
 
+**Verificar el estado del clúster:** una vez levantado con `docker-compose up
+-d`, el siguiente comando muestra los 3 nodos y confirma que el clúster está
+realmente distribuido (cada nodo posee una porción distinta del anillo de
+tokens):
+
+```bash
+docker exec -e JVM_OPTS= cassandra-node1 nodetool status
+```
+
+> El `-e JVM_OPTS=` anula esa variable de entorno solo para esta llamada;
+> sin eso, `nodetool` concatena su propio `-Xmx` (más pequeño) con el
+> `JVM_OPTS` del contenedor (`-Xms512M -Xmx512M`) y la JVM falla con
+> *"Initial heap size set to a larger value than the maximum heap size"*.
+
+Salida esperada (3 nodos `UN` = Up/Normal, cada uno con un `Owns %`
+distinto):
+
+```
+Datacenter: DC1
+===============
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address     Load        Tokens  Owns (effective)  Host ID    Rack
+UN  172.20.0.3  70.22 KiB   16      59.3%              ...        RAC1
+UN  172.20.0.4  70.23 KiB   16      76.0%              ...        RAC1
+UN  172.20.0.2  104.46 KiB  16      64.7%              ...        RAC1
+```
+
 ### 3.3 Flujo de autenticación y autorización
 
 ```mermaid
