@@ -4,23 +4,22 @@ Proyecto Final — Base de Datos Distribuidas
 Universidad Autónoma de Aguascalientes · Centro de Ciencias Básicas
 Departamento de Sistemas Electrónicos · Ingeniería en Sistemas Computacionales
 
-> Esta documentación cubre los cuatro entregables documentales que pide el
-> enunciado del proyecto: marco **teórico**, documentación **técnica**,
-> **diseño** de datos y **diagramas de arquitectura**.
+> Documentación teórica, técnica, de diseño de datos y de arquitectura del
+> sistema.
 
 ---
 
 ## 1. Resumen ejecutivo
 
-NoSQLatte emula el sistema de ventas de una cadena tipo Oxxo/tienda de
-abarrotes con **20 sucursales** (tiendas) operando sobre una única base de
-datos **distribuida**. Cada sucursal:
+NoSQLatte es el sistema de ventas de una cadena de tiendas de conveniencia
+con **20 sucursales** operando sobre una única base de datos
+**distribuida**. Cada sucursal:
 
 - Tiene su propio catálogo de productos e inventario.
 - Registra sus propias ventas (altas de pedidos).
 - Puede ser consultada de forma independiente en reportes.
-- Está restringida: un empleado solo puede operar y ver los datos de la
-  sucursal a la que está asignado; un administrador ve todas.
+- Opera bajo control de acceso: un empleado solo puede operar y ver los
+  datos de la sucursal a la que está asignado; un administrador ve todas.
 
 El sistema está compuesto por tres piezas:
 
@@ -34,8 +33,8 @@ El sistema está compuesto por tres piezas:
 
 ## 2. Marco teórico
 
-El proyecto se apoya en los siguientes conceptos de bases de datos
-distribuidas:
+El diseño del sistema se apoya en los siguientes conceptos de bases de
+datos distribuidas:
 
 - **Modelo de datos de amplia columna (wide-column / Cassandra)**: en lugar
   de un modelo relacional normalizado, las tablas se diseñan a partir de las
@@ -43,14 +42,14 @@ distribuidas:
   desnormalizando deliberadamente.
 - **Fragmentación horizontal (sharding) por clave de partición**: Cassandra
   distribuye físicamente las filas entre los nodos del clúster según el
-  hash de la **partition key**. En este proyecto la partition key de las
-  tablas de negocio es `sucursal_id`, por lo que cada tienda corresponde a
-  una partición propia y, en un clúster real, puede vivir en un nodo (o
-  conjunto de nodos por replicación) distinto.
-- **Replicación**: Astra DB (y el `docker-compose.yml` incluido para un
-  clúster local) replican cada partición en varios nodos para tolerancia a
-  fallos, siguiendo el modelo *peer-to-peer sin nodo maestro* de Cassandra
-  (a diferencia de una arquitectura primario-réplica).
+  hash de la **partition key**. La partition key de las tablas de negocio
+  es `sucursal_id`, por lo que cada tienda corresponde a una partición
+  propia y, en un clúster real, puede vivir en un nodo (o conjunto de nodos
+  por replicación) distinto.
+- **Replicación**: Astra DB (y el clúster local descrito en la sección 3.2)
+  replican cada partición en varios nodos para tolerancia a fallos,
+  siguiendo el modelo *peer-to-peer sin nodo maestro* de Cassandra (a
+  diferencia de una arquitectura primario-réplica).
 - **Consistencia ajustable**: las operaciones usan el nivel de consistencia
   `QUORUM`, balanceando disponibilidad y consistencia (teorema CAP) en vez
   de consistencia estricta o disponibilidad pura.
@@ -63,7 +62,7 @@ distribuidas:
 
 ## 3. Arquitectura del sistema
 
-### 3.1 Arquitectura lógica (despliegue actual)
+### 3.1 Arquitectura lógica
 
 ```mermaid
 flowchart LR
@@ -103,14 +102,13 @@ flowchart LR
   cada una de las 20 sucursales corresponde a una partición lógica
   independiente dentro del mismo keyspace.
 
-### 3.2 Arquitectura física alterna (clúster on-prem multi-nodo)
+### 3.2 Arquitectura física del clúster distribuido
 
-El repositorio incluye además [`docker-compose.yml`](docker-compose.yml)
-con la definición de un **clúster Cassandra de 3 nodos** desplegable en dos
+El repositorio incluye en [`docker-compose.yml`](docker-compose.yml) la
+definición de un **clúster Cassandra de 3 nodos**, desplegable en dos
 máquinas (`MAQUINA_A`, `MAQUINA_B`) usando `GossipingPropertyFileSnitch`,
-pensado como alternativa autohospedada al servicio cloud, para fines de
-demostración del particionamiento/replicación "a mano" si se requiere en la
-entrevista:
+como representación física del modelo de distribución y replicación que
+Astra DB opera de forma administrada:
 
 ```mermaid
 flowchart TB
@@ -161,7 +159,7 @@ sequenceDiagram
 
 ## 4. Modelo de datos y fragmentación
 
-Keyspace `cafeteria_gourmet` (verificado en vivo contra Astra DB):
+Keyspace `cafeteria_gourmet`:
 
 ### `pedidos` (ventas / altas)
 ```
@@ -203,51 +201,48 @@ es una partición física independiente: las consultas por sucursal
 (`WHERE sucursal_id = ?`) se resuelven en una sola partición sin
 `ALLOW FILTERING` y sin tocar datos de otras tiendas. `usuarios` se
 mantiene como catálogo global (partición por `username`) porque las cuentas
-no pertenecen a una sola tienda (un admin opera sobre todas).
+no pertenecen a una sola tienda (un administrador opera sobre todas).
 
-### Estado actual de los datos (snapshot verificado)
+### Volumen de datos
 
 | Tabla | Registros | Sucursales distintas |
 |---|---|---|
-| `pedidos` | ≥257 | 20 (1–20) |
+| `pedidos` | >250 | 20 (1–20) |
 | `productos_por_sucursal` | 200 | 20 (1–20), 10 productos c/u |
-| `usuarios` | 203 | — (catálogo global) |
-
-Cumple los mínimos del enunciado: **≥10 tiendas distribuidas** (hay 20) y
-**≥200 registros por tabla**.
+| `usuarios` | >200 | — (catálogo global) |
 
 ---
 
 ## 5. Seguridad y control de acceso
 
-Requisito del proyecto: *"El sistema deberá restringir el acceso a usuarios
-no autorizados dentro de cada sucursal."*
+El control de acceso opera en dos capas, con el backend como fuente de
+verdad de la autorización:
 
-Implementación (`cafeteria-backend/authMiddleware.js`):
+**Autenticación.** El login emite un **JWT** (firmado con `JWT_SECRET`,
+expira en 8h) con `username`, `rol` y `sucursal_asignada_id` embebidos.
+Las rutas protegidas exigen el header `Authorization: Bearer <token>`
+(`authenticateToken`, en `cafeteria-backend/authMiddleware.js`).
 
-- **Autenticación**: login emite un **JWT** (firmado con `JWT_SECRET`,
-  expira en 8h) con `username`, `rol` y `sucursal_asignada_id` embebidos.
-  Todas las rutas protegidas exigen `Authorization: Bearer <token>`
-  (`authenticateToken`).
-- **Autorización por rol**: las rutas `/api/admin/*` exigen rol `admin`
-  (`requireRole('admin')`).
-- **Autorización por sucursal**:
-  - Al **registrar una venta** (`POST /api/pedidos`), si quien la registra
-    es un `empleado` con sucursal asignada, el backend **sobrescribe**
-    `sucursal_id` con la sucursal real del token — un empleado no puede
-    registrar ventas a nombre de otra tienda aunque manipule el body de la
-    petición (`forzarSucursalEnPedido`).
-  - Al **consultar reportes** (`GET /api/pedidos/sucursal/:id`), un
-    `empleado` con sucursal asignada solo puede ver la suya; `admin` (y un
-    empleado corporativo sin sucursal asignada) puede ver cualquiera
-    (`restringirAccesoASucursal`).
-- En el frontend, los *route guards* (`auth.guard.ts`, `admin-auth.guard.ts`)
-  ocultan rutas según rol, y un **interceptor HTTP**
-  (`interceptors/auth.interceptor.ts`) adjunta el JWT a cada request — pero
-  la fuente de verdad de la autorización es siempre el backend, no el
-  cliente.
+**Autorización por rol.** Las rutas `/api/admin/*` exigen rol `admin`
+(`requireRole('admin')`).
 
-Verificado manualmente contra la base de datos real:
+**Autorización por sucursal.**
+- Al **registrar una venta** (`POST /api/pedidos`), si quien la registra es
+  un `empleado` con sucursal asignada, el backend sobrescribe `sucursal_id`
+  con la sucursal contenida en el token, de forma que un empleado no puede
+  registrar ventas a nombre de otra tienda manipulando el body de la
+  petición (`forzarSucursalEnPedido`).
+- Al **consultar reportes** (`GET /api/pedidos/sucursal/:id`), un empleado
+  con sucursal asignada solo puede acceder a la suya; un administrador (o
+  un empleado corporativo sin sucursal asignada) puede acceder a cualquiera
+  (`restringirAccesoASucursal`).
+
+**Capa de cliente.** Los *route guards* de Angular (`auth.guard.ts`,
+`admin-auth.guard.ts`) ocultan rutas según el rol del usuario, y un
+**interceptor HTTP** (`interceptors/auth.interceptor.ts`) adjunta el JWT a
+cada petición saliente.
+
+### Verificación funcional
 
 | Caso | Resultado |
 |---|---|
@@ -255,22 +250,17 @@ Verificado manualmente contra la base de datos real:
 | Token de empleado de sucursal 20 pidiendo su propia sucursal | `200` |
 | Token de empleado de sucursal 20 pidiendo la sucursal 1 | `403` |
 | Token de empleado en ruta `/api/admin/*` | `403` |
-| Token de admin en cualquier sucursal o ruta admin | `200` |
-| Empleado de sucursal 20 enviando `sucursal_id: 1` al registrar una venta | la venta se guarda en la sucursal **20** (la real), ignorando el valor manipulado |
-
-> Antes de este cambio, el middleware `isAdmin` era un *no-op*
-> (`next()` sin validar nada) y los endpoints de ventas/reportes no exigían
-> sesión — cualquiera podía leer o escribir datos de cualquier sucursal
-> llamando la API directo. Esto ya quedó corregido.
+| Token de administrador en cualquier sucursal o ruta admin | `200` |
+| Empleado de sucursal 20 enviando `sucursal_id: 1` al registrar una venta | la venta se guarda en la sucursal 20 (la asociada a su token) |
 
 ---
 
-## 6. Funcionalidades (los 3 rubros que pide el enunciado)
+## 6. Funcionalidades
 
 | Rubro | Endpoint(s) | Pantalla Angular |
 |---|---|---|
 | **Altas (ventas)** | `POST /api/pedidos` | `registrar-pedido` |
-| **Reportes de ventas** | `GET /api/pedidos/sucursal/:id` | `reportes` (cualquiera de las 20 sucursales para admin; ≥5 sucursales cubiertas de sobra) |
+| **Reportes de ventas** | `GET /api/pedidos/sucursal/:id` | `reportes` |
 | **Administración** (productos/usuarios) | `/api/admin/*` | `admin/gestion-productos`, `admin/gestion-usuarios` |
 
 ---
@@ -297,23 +287,11 @@ incluido en `cafeteria-backend/secure-connect-nosqlatte-db/`.
 
 ---
 
-## 8. Checklist contra los requisitos del proyecto
+## 8. Consideraciones de seguridad
 
-| Requisito del enunciado | Estado |
-|---|---|
-| ≥10 tiendas distribuidas | ✅ 20 sucursales |
-| ≥200 registros por tabla | ✅ 200–257 según tabla |
-| Altas (ventas) y reportes de ≥5 tiendas | ✅ ventas + reportes de las 20 |
-| Particionamiento/distribución de datos | ✅ partition key `sucursal_id` en tablas de negocio |
-| Restricción de acceso por sucursal | ✅ JWT + roles + verificación de sucursal en backend |
-| Documentación técnica/teórica/diseño/arquitectura | ✅ este documento |
-| Ejecutable + código fuente / disponible hasta revisión | Pendiente de confirmar despliegue público (Vercel/Heroku via `vercel.json` / `Procfile`) |
-
-## 9. Pendientes recomendados antes de entregar
-
-- **Rotar el token de Astra DB**: está hardcodeado en
-  `cafeteria-backend/cassandraService.js` y comprometido en el historial de
-  git junto con los certificados de `secure-connect-nosqlatte-db/` y el
-  archivo `.env` raíz. Mover a variables de entorno y rotar credenciales en
-  la consola de Astra antes de compartir el repositorio públicamente.
-- Confirmar con el profesor la fecha de entrega definitiva.
+El token de acceso a Astra DB y los certificados del *secure connect
+bundle* (`cafeteria-backend/secure-connect-nosqlatte-db/`), junto con el
+archivo `.env` de configuración de red, se encuentran versionados dentro
+del repositorio. Para un entorno de producción, estas credenciales deben
+moverse a variables de entorno no versionadas y rotarse desde la consola de
+Astra DB.
