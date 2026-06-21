@@ -51,7 +51,7 @@
                             <select id="filtro_sucursal_select" [(ngModel)]="filtroSucursalAsignada"
                                 (change)="aplicarFiltrosUsuarios()">
                                 <option [value]="null">Todas las Sucursales</option>
-                                <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}
+                                <option *ngFor="let id of sucursalesDisponibles" [value]="id">{{ id | nombreSucursal }}
                                 </option>
                             </select>
                             <label for="filtro_sucursal_select">Filtrar por Sucursal</label>
@@ -83,7 +83,7 @@
                     <td>{{ user.username }}</td>
                     <td>{{ user.nombre_completo }}</td>
                     <td>{{ user.rol | titlecase }}</td>
-                    <td>{{ user.sucursal_asignada_id !== null ? 'Sucursal ' + user.sucursal_asignada_id : 'Todas/N/A' }}</td>
+                    <td>{{ user.sucursal_asignada_id !== null ? (user.sucursal_asignada_id | nombreSucursal) : 'Todas/N/A' }}</td>
                     <td>
                         <button class="btn-floating waves-effect waves-light blue modal-trigger" title="Editar Usuario"
                             data-target="modalUsuario" (click)="abrirModalEdicionUsuario(user)"
@@ -170,7 +170,7 @@
                             #sucursalUsuarioSelect="ngModel">
                             <option [value]="null" disabled [selected]="formUsuario.sucursal_asignada_id === null">
                                 Selecciona una sucursal *</option>
-                            <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}</option>
+                            <option *ngFor="let id of sucursalesDisponibles" [value]="id">{{ id | nombreSucursal }}</option>
                         </select>
                         <label for="form_sucursal_asignada">Sucursal Asignada *</label>
                         <span class="helper-text red-text"

@@ -346,6 +346,38 @@ h5 {
   outline: none !important;
 }
 
+/* Inputs de fecha (filtro por rango) */
+#filtro_fecha_inicio,
+#filtro_fecha_fin {
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(212,233,226,0.3) !important;
+  border-radius: 8px !important;
+  padding: 0 12px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  color: var(--sb-light-green) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  color-scheme: dark;
+}
+
+#filtro_fecha_inicio:focus,
+#filtro_fecha_fin:focus {
+  border-color: var(--sb-gold) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#filtro_fecha_inicio::-webkit-calendar-picker-indicator,
+#filtro_fecha_fin::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
 /* === MENSAJES === */
 .card-panel.teal.lighten-5 {
   background-color: var(--sb-light-green) !important;

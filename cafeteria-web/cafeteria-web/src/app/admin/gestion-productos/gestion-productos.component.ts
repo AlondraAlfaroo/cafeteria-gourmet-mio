@@ -5,13 +5,14 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { ProductoMenu } from '../../models/producto-menu.interface';
 import { AdminProductoService } from '../../services/admin-producto.service';
 import { PedidoService } from '../../services/pedido.service';
+import { NombreSucursalPipe } from '../../shared/nombre-sucursal.pipe';
 
 declare var M: any;
 
 @Component({
   selector: 'app-gestion-productos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NombreSucursalPipe],
   templateUrl: './gestion-productos.component.html',
   styleUrls: ['./gestion-productos.component.css']
 })

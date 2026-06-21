@@ -2,9 +2,10 @@
 import { Component, OnInit, AfterViewInit, ElementRef, inject, ChangeDetectorRef, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PedidoService, ProductoStats, CategoriaStats } from '../../services/pedido.service';
+import { PedidoService, ProductoStats, CategoriaStats, ResumenSucursal } from '../../services/pedido.service';
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import { NombreSucursalPipe } from '../../shared/nombre-sucursal.pipe';
 
 declare var M: any;
 
@@ -31,7 +32,7 @@ interface EstadisticasSucursal {
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NombreSucursalPipe],
   templateUrl: './reportes.component.html',
   styleUrls: ['./reportes.component.css']
 })
@@ -53,7 +54,14 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
   filtroProducto: string = '';
   filtroCategoria: string = '';
   filtroUsuario: string = '';
+  filtroFechaInicio: string = '';
+  filtroFechaFin: string = '';
   ordenPrecio: string = '';
+
+  cargandoComparativo = false;
+  errorComparativo: string | null = null;
+  resumenComparativo: ResumenSucursal[] = [];
+  maxVentaComparativo = 0;
 
   productosDisponibles: string[] = [];
   categoriasDisponibles: string[] = [];
@@ -134,6 +142,10 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.resetearEstadoReporte();
 
     if (this.currentUser) {
+      if (this.currentUser.rol === 'admin') {
+        this.cargarReporteComparativo();
+      }
+
       if (this.currentUser.rol === 'admin' || (this.currentUser.rol === 'empleado' && this.currentUser.sucursal_asignada_id === null)) {
         this.puedeSeleccionarSucursal = true;
         this.cargarSucursalesParaFiltro();
@@ -219,6 +231,20 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.resetearEstadoReporte();
       }
     });
+  }
+
+  private aFecha(fecha: Date | string): Date {
+    return fecha instanceof Date ? fecha : new Date(fecha);
+  }
+
+  // Los inputs type="date" entregan "YYYY-MM-DD", y new Date(str) lo interpreta como
+  // medianoche UTC, no local. En zonas horarias detrás de UTC eso recorta el día
+  // seleccionado por completo. Se construye la fecha con componentes locales en su lugar.
+  private fechaLocalDesdeInput(valor: string, finDelDia: boolean): Date {
+    const [anio, mes, dia] = valor.split('-').map(Number);
+    return finDelDia
+      ? new Date(anio, mes - 1, dia, 23, 59, 59, 999)
+      : new Date(anio, mes - 1, dia, 0, 0, 0, 0);
   }
 
   private calcularEstadisticas(pedidos: Pedido[]): EstadisticasSucursal {
@@ -318,6 +344,16 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
       pedidos = pedidos.filter(pedido => pedido.username.toLowerCase().includes(searchTerm));
     }
 
+    if (this.filtroFechaInicio) {
+      const inicio = this.fechaLocalDesdeInput(this.filtroFechaInicio, false);
+      pedidos = pedidos.filter(pedido => this.aFecha(pedido.fecha_pedido) >= inicio);
+    }
+
+    if (this.filtroFechaFin) {
+      const fin = this.fechaLocalDesdeInput(this.filtroFechaFin, true);
+      pedidos = pedidos.filter(pedido => this.aFecha(pedido.fecha_pedido) <= fin);
+    }
+
     if (this.ordenPrecio) {
       pedidos.sort((a, b) => {
         if (this.ordenPrecio === 'asc') {
@@ -342,6 +378,8 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filtroProducto = '';
     this.filtroCategoria = '';
     this.filtroUsuario = '';
+    this.filtroFechaInicio = '';
+    this.filtroFechaFin = '';
     this.ordenPrecio = '';
     this.productosDisponibles = [];
     this.categoriasDisponibles = [];
@@ -352,5 +390,51 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chartVentasPorMesData = [];
 
     this.initMaterializeSelects();
+  }
+
+  cargarReporteComparativo(): void {
+    this.cargandoComparativo = true;
+    this.errorComparativo = null;
+
+    this.pedidoService.getReporteComparativo().subscribe({
+      next: (data: ResumenSucursal[]) => {
+        this.resumenComparativo = data;
+        this.maxVentaComparativo = data.length > 0 ? Math.max(...data.map(d => Number(d.totalVentas))) : 0;
+        this.cargandoComparativo = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Error al cargar el reporte comparativo:', err);
+        this.errorComparativo = 'No se pudo cargar el reporte comparativo de sucursales.';
+        this.cargandoComparativo = false;
+      }
+    });
+  }
+
+  exportarCSV(): void {
+    if (this.pedidosFiltrados.length === 0) {
+      M.toast({ html: 'No hay datos para exportar.', classes: 'orange rounded' });
+      return;
+    }
+
+    const encabezados = ['ID Pedido', 'Fecha', 'Producto', 'Categoria', 'Cantidad', 'Total', 'Usuario'];
+    const filas = this.pedidosFiltrados.map(pedido => [
+      pedido.pedido_id,
+      this.aFecha(pedido.fecha_pedido).toLocaleString('es-MX'),
+      `"${pedido.producto}"`,
+      `"${pedido.categoria}"`,
+      pedido.cantidad,
+      Number(pedido.total).toFixed(2),
+      pedido.username
+    ].join(','));
+
+    const csv = [encabezados.join(','), ...filas].join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = `reporte_sucursal_${this.sucursalSeleccionadaParaReporte}_${new Date().toISOString().slice(0, 10)}.csv`;
+    enlace.click();
+    URL.revokeObjectURL(url);
   }
 }

@@ -17,6 +17,12 @@ export interface CategoriaStats {
   total_ingresos: number;
 }
 
+export interface ResumenSucursal {
+  sucursal_id: number;
+  totalVentas: number;
+  totalPedidos: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -63,5 +69,9 @@ export class PedidoService {
 
   getEstadisticasPorCategoriaEnSucursal(sucursalId: number): Observable<CategoriaStats[]> {
     return this.http.get<CategoriaStats[]>(`${this.apiUrl}/reportes/sucursal/${sucursalId}/categorias`);
+  }
+
+  getReporteComparativo(): Observable<ResumenSucursal[]> {
+    return this.http.get<ResumenSucursal[]>(`${this.apiUrl}/reportes/comparativo`);
   }
 }

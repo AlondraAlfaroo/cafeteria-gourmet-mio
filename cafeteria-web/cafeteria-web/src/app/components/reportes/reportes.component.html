@@ -12,7 +12,7 @@
                 Selecciona una sucursal para ver su reporte...
             </option>
             <option *ngFor="let id of sucursalesDisponibles" [value]="id">
-                Sucursal {{ id }}
+                {{ id | nombreSucursal }}
             </option>
         </select>
         <label for="sucursal_reporte_select" *ngIf="!sucursalSeleccionadaParaReporte">
@@ -23,7 +23,7 @@
 
     <div *ngIf="!puedeSeleccionarSucursal && currentUser && currentUser.rol === 'empleado' && currentUser.sucursal_asignada_id !== null"
         class="section">
-        <h4>Reporte para tu Sucursal Asignada: Sucursal {{ currentUser.sucursal_asignada_id }}</h4>
+        <h4>Reporte para tu Sucursal Asignada: {{ currentUser.sucursal_asignada_id | nombreSucursal }}</h4>
     </div>
 
     <div *ngIf="puedeSeleccionarSucursal && sucursalSeleccionadaParaReporte === null && !errorReporte && sucursalesDisponibles.length > 0"
@@ -42,7 +42,7 @@
     <div class="row"
         *ngIf="mostrarEstadisticas && estadisticas && sucursalSeleccionadaParaReporte !== null && !cargandoReporte && !errorReporte">
         <h4 class="center-align" style="margin-top: 30px;">Estadísticas de Pedidos -
-            Sucursal {{ sucursalSeleccionadaParaReporte }}</h4>
+            {{ sucursalSeleccionadaParaReporte | nombreSucursal }}</h4>
 
         <div class="col s12 m4" style="margin-top: 20px;">
             <div class="card">
@@ -56,7 +56,7 @@
             <div class="card">
                 <div class="card-content center-align">
                     <h5 class="green-text">{{ estadisticas.totalPedidos }}</h5>
-                    <p>Total de Pedidos</p>
+                    <p>Total de Productos Vendidos</p>
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@
             <div class="card">
                 <div class="card-content center-align">
                     <h5 class="orange-text">{{ estadisticas.promedioVentaPorPedido | currency:'MXN':'symbol':'1.2-2' }}</h5>
-                    <p>Promedio por Pedido</p>
+                    <p>Promedio por Producto Vendido</p>
                 </div>
             </div>
         </div>
@@ -168,13 +168,31 @@
                             <option value="desc">Mayor a Menor</option>
                         </select>
                     </div>
+                    <div class="input-field col s12 m2" style="margin-top: 0;">
+                        <input id="filtro_fecha_inicio" type="date" [(ngModel)]="filtroFechaInicio"
+                            (change)="aplicarFiltrosYActualizar()">
+                        <label for="filtro_fecha_inicio" class="active">Desde</label>
+                    </div>
+                    <div class="input-field col s12 m2" style="margin-top: 0;">
+                        <input id="filtro_fecha_fin" type="date" [(ngModel)]="filtroFechaFin"
+                            (change)="aplicarFiltrosYActualizar()">
+                        <label for="filtro_fecha_fin" class="active">Hasta</label>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom: 0; margin-top: 10px;">
+                    <div class="col s12 right-align">
+                        <button class="btn waves-effect waves-light brown darken-1" type="button"
+                            (click)="exportarCSV()" [disabled]="pedidosFiltrados.length === 0">
+                            <i class="material-icons left">file_download</i>Exportar CSV
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div *ngIf="!cargandoReporte && !errorReporte && pedidosFiltrados.length > 0">
-        <h5 style="margin-top: 30px;">Detalle de Pedidos - Sucursal {{ sucursalSeleccionadaParaReporte }}</h5>
+        <h5 style="margin-top: 30px;">Detalle de Pedidos - {{ sucursalSeleccionadaParaReporte | nombreSucursal }}</h5>
         <table class="striped responsive-table highlight">
             <thead>
                 <tr>
@@ -203,7 +221,37 @@
 
     <div *ngIf="!cargandoReporte && !errorReporte && sucursalSeleccionadaParaReporte !== null && pedidosFiltrados.length === 0"
         style="margin-top: 20px;">
-        <p class="card-panel blue-grey lighten-5">No hay pedidos registrados para la Sucursal {{
-            sucursalSeleccionadaParaReporte }} que coincidan con los filtros aplicados.</p>
+        <p class="card-panel blue-grey lighten-5">No hay pedidos registrados para {{
+            sucursalSeleccionadaParaReporte | nombreSucursal }} que coincidan con los filtros aplicados.</p>
+    </div>
+
+    <hr *ngIf="currentUser && currentUser.rol === 'admin'">
+
+    <div class="row" *ngIf="currentUser && currentUser.rol === 'admin'" style="margin-top: 20px;">
+        <h4 class="center-align">Reporte Comparativo - Todas las Sucursales</h4>
+
+        <div *ngIf="cargandoComparativo" class="progress"><div class="indeterminate"></div></div>
+
+        <div *ngIf="errorComparativo" class="card-panel red lighten-4 red-text text-darken-4">{{ errorComparativo }}</div>
+
+        <div *ngIf="!cargandoComparativo && !errorComparativo" class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <div *ngIf="resumenComparativo.length === 0" class="no-data-message">No hay ventas registradas todavía.</div>
+                    <div *ngFor="let item of resumenComparativo" class="chart-item-css">
+                        <span class="chart-label-css">{{ item.sucursal_id | nombreSucursal }}</span>
+                        <div class="chart-bar-row">
+                            <div class="chart-bar-track">
+                                <div class="chart-bar-css"
+                                    [style.width.%]="maxVentaComparativo > 0 ? (item.totalVentas / maxVentaComparativo) * 100 : 0"
+                                    style="background-color: #00704A;"></div>
+                            </div>
+                            <span class="chart-value-css">{{ item.totalVentas | currency:'MXN':'symbol':'1.2-2' }}
+                                ({{ item.totalPedidos }} productos vendidos)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

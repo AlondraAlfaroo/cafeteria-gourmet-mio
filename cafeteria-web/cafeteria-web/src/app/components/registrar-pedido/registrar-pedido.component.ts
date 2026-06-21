@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router'; // Importa ActivatedRo
 import { PedidoService } from '../../services/pedido.service'; // Ajusta la ruta si es necesario
 import { ProductoMenu } from '../../models/producto-menu.interface'; // Ajusta la ruta si es necesario
 import { AuthService, UserProfile } from '../../services/auth.service'; // <-- ¡IMPORTANTE: DESCOMENTA Y USA AuthService!
+import { NombreSucursalPipe } from '../../shared/nombre-sucursal.pipe';
 
 declare var M: any;
 
@@ -14,7 +15,8 @@ declare var M: any;
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    NombreSucursalPipe
   ],
   templateUrl: './registrar-pedido.component.html',
   styleUrls: ['./registrar-pedido.component.css']

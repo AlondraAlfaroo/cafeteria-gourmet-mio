@@ -11,7 +11,7 @@
             <select id="admin_sucursal_select" [(ngModel)]="sucursalSeleccionada" (change)="onSucursalChange()"
                 name="admin_sucursal_select">
                 <option value="" disabled [selected]="sucursalSeleccionada === null">Selecciona una sucursal...</option>
-                <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}</option>
+                <option *ngFor="let id of sucursalesDisponibles" [value]="id">{{ id | nombreSucursal }}</option>
             </select>
             <label for="admin_sucursal_select">Gestionar Productos de Sucursal</label>
         </div>
@@ -74,7 +74,7 @@
 
 
     <div *ngIf="sucursalSeleccionada && !isLoadingProductos">
-        <h4 class="header">Productos en Sucursal {{ sucursalSeleccionada }}</h4>
+        <h4 class="header">Productos en {{ sucursalSeleccionada | nombreSucursal }}</h4>
         <table class="striped responsive-table highlight"
             *ngIf="productosFiltrados.length > 0; else noProductosTemplate">
             <thead>

@@ -12,7 +12,7 @@
                 <select id="sucursal_pedido_registro" name="sucursal_id_pedido" [(ngModel)]="nuevoPedido.sucursal_id"
                     required #sucursalDelPedidoSelect>
                     <option value="" disabled selected>Elige sucursal para el pedido *</option>
-                    <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}</option>
+                    <option *ngFor="let id of sucursalesDisponibles" [value]="id">{{ id | nombreSucursal }}</option>
                 </select>
                 <label for="sucursal_pedido_registro">Sucursal del Pedido</label>
             </div>
@@ -63,7 +63,7 @@
         <div class="input-field col s12 m6">
             <select id="sucursal_menu_select" (change)="onSucursalParaMenuChange($event)" #sucursalMenuSelect>
                 <option value="" disabled selected>Ver menú de la sucursal...</option>
-                <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}</option>
+                <option *ngFor="let id of sucursalesDisponibles" [value]="id">{{ id | nombreSucursal }}</option>
             </select>
             <label for="sucursal_menu_select">Mostrar Menú de Sucursal</label>
         </div>
@@ -79,7 +79,7 @@
 
     <div class="row product-grid">
         <div *ngIf="sucursalParaMenu && productosDelMenu.length === 0 && !errorCargaProductos" class="col s12">
-            <p>No hay productos en el menú para la Sucursal {{ sucursalParaMenu }} o aún se están cargando.</p>
+            <p>No hay productos en el menú para {{ sucursalParaMenu | nombreSucursal }} o aún se están cargando.</p>
         </div>
 
         <div *ngFor="let producto of productosDelMenu" class="col s12 m6 l4" style="padding: 15px 5px;">

@@ -315,6 +315,18 @@ async function startServer() {
             }
         });
 
+        // Reporte comparativo de ventas entre todas las sucursales. Solo admin: un empleado
+        // de una sola sucursal no debe ver las ventas de las demás.
+        app.get('/api/reportes/comparativo', isAdmin, async (req, res) => {
+            try {
+                const resumen = await db.getResumenVentasPorTodasSucursales();
+                res.json(resumen);
+            } catch (err) {
+                console.error('Error en GET /api/reportes/comparativo:', err);
+                res.status(500).json({ error: 'Error al obtener el reporte comparativo.' });
+            }
+        });
+
 
         // 3. Iniciar el servidor Express para escuchar peticiones
         app.listen(PORT, () => {
@@ -326,6 +338,7 @@ async function startServer() {
             console.log(`  POST /api/auth/login`);
             console.log(`  GET  /api/sucursales`);
             console.log(`  GET  /api/pedidos/sucursal/:id`);
+            console.log(`  GET  /api/reportes/comparativo (solo admin)`);
         });
 
     } catch (err) {

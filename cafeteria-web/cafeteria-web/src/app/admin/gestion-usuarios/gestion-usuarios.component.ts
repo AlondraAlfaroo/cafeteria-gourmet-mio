@@ -6,13 +6,14 @@ import { UserProfile } from '../../services/auth.service';
 import { AdminUserService } from '../../services/admin-user.service';
 import { PedidoService } from '../../services/pedido.service';
 import { AuthService } from '../../services/auth.service';
+import { NombreSucursalPipe } from '../../shared/nombre-sucursal.pipe';
 
 declare var M: any;
 
 @Component({
   selector: 'app-gestion-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NombreSucursalPipe],
   templateUrl: './gestion-usuarios.component.html',
   styleUrls: ['./gestion-usuarios.component.css']
 })

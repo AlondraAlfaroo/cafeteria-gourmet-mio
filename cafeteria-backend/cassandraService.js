@@ -110,6 +110,23 @@ async function getSucursalesUnicas() {
     return result.rows.map(row => row.sucursal_id).sort((a, b) => a - b);
 }
 
+// Reporte comparativo: agrega total de ventas y de líneas vendidas por cada sucursal.
+// Pensado para el admin, que necesita ver todas las sucursales (la fragmentación de datos
+// por sucursal_id como partition key impide un SUM agregado en una sola consulta CQL).
+async function getResumenVentasPorTodasSucursales() {
+    const sucursales = await getSucursalesUnicas();
+    const resumenes = await Promise.all(sucursales.map(async (sucursalId) => {
+        const pedidos = await consultarPedidosPorSucursal(sucursalId);
+        const totalVentas = pedidos.reduce((sum, p) => sum + Number(p.total), 0);
+        return {
+            sucursal_id: sucursalId,
+            totalVentas: parseFloat(totalVentas.toFixed(2)),
+            totalPedidos: pedidos.length
+        };
+    }));
+    return resumenes.sort((a, b) => b.totalVentas - a.totalVentas);
+}
+
 // --- Funciones de Productos (Públicas/Cliente) ---
 // En cassandraService.js (backend)
 async function getProductosPorSucursal(sucursalId) {
@@ -449,6 +466,7 @@ module.exports = {
     consultarPedidosPorSucursal,
     consultarPedidosPorProducto,
     getSucursalesUnicas,
+    getResumenVentasPorTodasSucursales,
     client,
     getProductosPorSucursal,
     getTodosLosProductosUnicos,

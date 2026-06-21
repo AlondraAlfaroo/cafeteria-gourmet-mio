@@ -2,6 +2,7 @@ import { Component, OnInit, inject, AfterViewInit, ElementRef } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // Para ngModel
 import { PedidoService } from '../../services/pedido.service';
+import { NombreSucursalPipe } from '../../shared/nombre-sucursal.pipe';
 
 declare var M: any; // Para Materialize
 
@@ -18,7 +19,7 @@ export interface ProductoMenu {
 @Component({
   selector: 'app-menu-pedidos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NombreSucursalPipe],
   templateUrl: './menu-pedidos.component.html',
   styleUrls: ['./menu-pedidos.component.css']
 })

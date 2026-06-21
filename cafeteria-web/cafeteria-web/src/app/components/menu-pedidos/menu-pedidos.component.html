@@ -5,7 +5,7 @@
         <div class="input-field col s12 m6">
             <select id="sucursal_pedido" [(ngModel)]="nuevoPedido.sucursal_id">
                 <option value="" disabled selected>Elige una sucursal</option>
-                <option *ngFor="let id of sucursalesDisponibles" [value]="id">Sucursal {{ id }}</option>
+                <option *ngFor="let id of sucursalesDisponibles" [value]="id">{{ id | nombreSucursal }}</option>
             </select>
             <label for="sucursal_pedido">Sucursal</label>
         </div>
