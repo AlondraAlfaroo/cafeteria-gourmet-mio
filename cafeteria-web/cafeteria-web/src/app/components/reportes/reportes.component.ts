@@ -146,10 +146,11 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cargarReporteComparativo();
       }
 
-      if (this.currentUser.rol === 'admin' || (this.currentUser.rol === 'empleado' && this.currentUser.sucursal_asignada_id === null)) {
+      if (this.currentUser.rol === 'admin') {
         this.puedeSeleccionarSucursal = true;
         this.cargarSucursalesParaFiltro();
       } else if (this.currentUser.rol === 'empleado' && this.currentUser.sucursal_asignada_id !== null) {
+        // Un empleado siempre ve únicamente el reporte de su propia sucursal, sin excepciones.
         this.puedeSeleccionarSucursal = false;
         this.sucursalSeleccionadaParaReporte = this.currentUser.sucursal_asignada_id;
         this.sucursalesDisponibles = [this.currentUser.sucursal_asignada_id];

@@ -228,8 +228,11 @@ async function registrarUsuario(userData) {
     // El '10' es el número de "salt rounds", un valor más alto es más seguro pero más lento. 10 es un buen balance.
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-    const query = `INSERT INTO usuarios (username, nombre_completo, password_hash, rol, sucursal_asignada_id) 
-                   VALUES (?, ?, ?, ?, ?)`;
+    // IF NOT EXISTS es necesario: un INSERT normal en Cassandra hace upsert silencioso,
+    // así que sin esto cualquiera podría "registrarse" con un username ya existente y
+    // sobrescribir esa cuenta (password_hash incluido) sin ningún error.
+    const query = `INSERT INTO usuarios (username, nombre_completo, password_hash, rol, sucursal_asignada_id)
+                   VALUES (?, ?, ?, ?, ?) IF NOT EXISTS`;
     const params = [
         userData.username,
         userData.nombre_completo || null, // Puede ser opcional
@@ -239,12 +242,15 @@ async function registrarUsuario(userData) {
     ];
 
     try {
-        await client.execute(query, params, { prepare: true });
+        const result = await client.execute(query, params, { prepare: true });
+        const aplicado = result.rows && result.rows[0] && result.rows[0]['[applied]'];
+        if (!aplicado) {
+            throw new Error('El nombre de usuario ya está en uso. Por favor, elige otro.');
+        }
         return { success: true, message: 'Usuario registrado exitosamente.' };
     } catch (error) {
-        // Manejar error de username duplicado, por ejemplo (Cassandra lanzará un error si la PK se duplica)
-        if (error.code === 8704 && error.message.includes('Primary key already exists')) { // Código común para dup. PK
-            throw new Error('El nombre de usuario ya está en uso. Por favor, elige otro.');
+        if (error.message && error.message.includes('El nombre de usuario ya está en uso')) {
+            throw error;
         }
         console.error("Error al registrar usuario en Cassandra:", error);
         throw error;

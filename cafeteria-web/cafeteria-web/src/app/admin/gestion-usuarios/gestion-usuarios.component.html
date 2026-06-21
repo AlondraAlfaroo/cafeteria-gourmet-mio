@@ -138,6 +138,10 @@
                             *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)">
                             Contraseña es requerida.
                         </span>
+                        <span class="helper-text red-text"
+                            *ngIf="passwordInput.valid && passwordInput.dirty && formUsuario.password && formUsuario.password.length < 6">
+                            La contraseña debe tener al menos 6 caracteres.
+                        </span>
                     </div>
                     <div class="input-field col s12" *ngIf="!esModoEdicionUsuario">
                         <input id="form_confirm_password" name="form_confirm_password" type="password"

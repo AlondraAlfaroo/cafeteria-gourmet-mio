@@ -10,7 +10,8 @@
         <form (ngSubmit)="onSubmitPedido()" #pedidoForm="ngForm">
             <div class="input-field col s12 m6">
                 <select id="sucursal_pedido_registro" name="sucursal_id_pedido" [(ngModel)]="nuevoPedido.sucursal_id"
-                    required #sucursalDelPedidoSelect>
+                    (change)="onSucursalChange($event)" required
+                    #sucursalDelPedidoSelect>
                     <option value="" disabled selected>Elige sucursal para el pedido *</option>
                     <option *ngFor="let id of sucursalesDisponibles" [value]="id">{{ id | nombreSucursal }}</option>
                 </select>
@@ -39,7 +40,7 @@
 
             <div class="input-field col s12 m4">
                 <input id="cantidad_pedido" name="cantidad_pedido" type="number" [(ngModel)]="nuevoPedido.cantidad"
-                    min="1" required>
+                    min="1" required [disabled]="!nuevoPedido.producto_id">
                 <label for="cantidad_pedido" class="active">Cantidad *</label>
             </div>
 
@@ -60,16 +61,9 @@
 
     <div class="row section">
         <h3 class="header">Menú Disponible</h3>
-        <div class="input-field col s12 m6">
-            <select id="sucursal_menu_select" (change)="onSucursalParaMenuChange($event)" #sucursalMenuSelect>
-                <option value="" disabled selected>Ver menú de la sucursal...</option>
-                <option *ngFor="let id of sucursalesDisponibles" [value]="id">{{ id | nombreSucursal }}</option>
-            </select>
-            <label for="sucursal_menu_select">Mostrar Menú de Sucursal</label>
-        </div>
 
-        <div *ngIf="!sucursalParaMenu && productosDelMenu.length === 0 && !errorCargaProductos" class="col s12">
-            <p>Por favor, selecciona una sucursal para ver su menú.</p>
+        <div *ngIf="!nuevoPedido.sucursal_id && productosDelMenu.length === 0 && !errorCargaProductos" class="col s12">
+            <p>Selecciona una sucursal arriba para ver su menú.</p>
         </div>
 
         <div *ngIf="errorCargaProductos" class="col s12 error-message">
@@ -78,8 +72,8 @@
     </div>
 
     <div class="row product-grid">
-        <div *ngIf="sucursalParaMenu && productosDelMenu.length === 0 && !errorCargaProductos" class="col s12">
-            <p>No hay productos en el menú para {{ sucursalParaMenu | nombreSucursal }} o aún se están cargando.</p>
+        <div *ngIf="nuevoPedido.sucursal_id && productosDelMenu.length === 0 && !errorCargaProductos" class="col s12">
+            <p>No hay productos en el menú para {{ nuevoPedido.sucursal_id | nombreSucursal }} o aún se están cargando.</p>
         </div>
 
         <div *ngFor="let producto of productosDelMenu" class="col s12 m6 l4" style="padding: 15px 5px;">

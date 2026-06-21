@@ -7,7 +7,6 @@ const {
     generarToken,
     authenticateToken,
     requireRole,
-    forzarSucursalEnPedido,
     restringirAccesoASucursal
 } = require('./authMiddleware');
 
@@ -145,6 +144,11 @@ app.get('/api/admin/usuarios', isAdmin, async (req, res) => {
 app.put('/api/admin/usuarios/:username', isAdmin, async (req, res) => {
     try {
         const userData = { ...req.body, username: req.params.username };
+
+        if (userData.rol === 'empleado' && (userData.sucursal_asignada_id === null || userData.sucursal_asignada_id === undefined)) {
+            return res.status(400).json({ error: 'Un usuario con rol empleado debe tener una sucursal asignada.' });
+        }
+
         const resultado = await db.adminUpdateUser(userData);
         res.json(resultado);
     } catch (err) {
@@ -172,7 +176,7 @@ async function startServer() {
         await db.connectDB();
 
         // Endpoint para registrar un nuevo pedido (MODIFICADO para recibir username)
-        app.post('/api/pedidos', authenticateToken, forzarSucursalEnPedido, async (req, res) => {
+        app.post('/api/pedidos', authenticateToken, async (req, res) => {
             try {
                 const pedidoData = req.body; // Ahora pedidoData DEBE incluir 'username'
                 if (!pedidoData.producto_id || !pedidoData.sucursal_id || !pedidoData.cantidad || !pedidoData.username) { // <-- ¡username ahora es requerido!
@@ -251,41 +255,74 @@ async function startServer() {
         });
 
 
-        // NUEVO ENDPOINT: Registrar Usuario
+        // ENDPOINT PÚBLICO: Auto-registro de clientes. SIEMPRE crea rol 'registrado'
+        // sin sucursal: es la única forma de evitar que cualquiera, sin sesión, se
+        // autoasigne rol 'admin' o 'empleado' mandando esos campos en el body.
         app.post('/api/auth/register', async (req, res) => {
-            const { username, password, nombre_completo, rol, sucursal_asignada_id } = req.body;
-            // Validaciones básicas de entrada
+            const { username, password, nombre_completo } = req.body;
             if (!username || !password || !nombre_completo) {
                 return res.status(400).json({ error: 'Usuario, contraseña y nombre completo son requeridos.' });
             }
-            if (password.length < 6) { // Ejemplo de regla de contraseña
+            if (password.length < 6) {
                 return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
             }
 
             try {
-                // rol por defecto 'registrado' si no es admin quien lo crea
-                const userRole = rol && rol === 'admin' ? 'admin' : 'registrado';
-
-                // sucursal_asignada_id solo para empleados
-                const userSucursal = (userRole === 'empleado' && sucursal_asignada_id !== undefined) ? sucursal_asignada_id : null;
-
                 const newUser = {
                     username,
-                    password, // bcrypt.hash espera la contraseña sin hashear
+                    password,
                     nombre_completo,
-                    rol: userRole,
-                    sucursal_asignada_id: userSucursal
+                    rol: 'registrado',
+                    sucursal_asignada_id: null
                 };
 
                 const result = await db.registrarUsuario(newUser);
                 res.status(201).json({ message: result.message || 'Usuario registrado con éxito.' });
             } catch (err) {
                 console.error('Error en registro:', err);
-                // Si el error del servicio es por usuario duplicado, devuelve 409 Conflict
                 if (err.message && err.message.includes('El nombre de usuario ya está en uso')) {
                     res.status(409).json({ error: err.message });
                 } else {
                     res.status(500).json({ error: err.message || 'Error al registrar el usuario.' });
+                }
+            }
+        });
+
+        // ENDPOINT ADMIN: Alta de usuario con cualquier rol (registrado/empleado/admin).
+        // Solo el admin puede otorgar rol empleado/admin o asignar sucursal.
+        app.post('/api/admin/usuarios', isAdmin, async (req, res) => {
+            const { username, password, nombre_completo, rol, sucursal_asignada_id } = req.body;
+            if (!username || !password || !nombre_completo) {
+                return res.status(400).json({ error: 'Usuario, contraseña y nombre completo son requeridos.' });
+            }
+            if (password.length < 6) {
+                return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+            }
+
+            const rolesValidos = ['registrado', 'empleado', 'admin'];
+            const rolFinal = rolesValidos.includes(rol) ? rol : 'registrado';
+
+            if (rolFinal === 'empleado' && (sucursal_asignada_id === null || sucursal_asignada_id === undefined)) {
+                return res.status(400).json({ error: 'Un usuario con rol empleado debe tener una sucursal asignada.' });
+            }
+
+            try {
+                const newUser = {
+                    username,
+                    password,
+                    nombre_completo,
+                    rol: rolFinal,
+                    sucursal_asignada_id: rolFinal === 'empleado' ? Number(sucursal_asignada_id) : null
+                };
+
+                const result = await db.registrarUsuario(newUser);
+                res.status(201).json({ message: result.message || 'Usuario creado con éxito.' });
+            } catch (err) {
+                console.error('Error en POST /api/admin/usuarios:', err);
+                if (err.message && err.message.includes('El nombre de usuario ya está en uso')) {
+                    res.status(409).json({ error: err.message });
+                } else {
+                    res.status(500).json({ error: err.message || 'Error al crear el usuario.' });
                 }
             }
         });

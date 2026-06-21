@@ -23,7 +23,6 @@ declare var M: any;
 })
 export class RegistrarPedidoComponent implements OnInit, AfterViewInit {
   productosDelMenu: ProductoMenu[] = [];
-  sucursalParaMenu: number | null = null;
 
   nuevoPedido = {
     sucursal_id: null as number | null,
@@ -54,12 +53,6 @@ export class RegistrarPedidoComponent implements OnInit, AfterViewInit {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
       this.nuevoPedido.username = currentUser.username;
-      // Lógica para preseleccionar sucursal si el usuario es empleado
-      if (currentUser.rol === 'empleado' && currentUser.sucursal_asignada_id !== null) {
-        this.nuevoPedido.sucursal_id = currentUser.sucursal_asignada_id;
-        this.sucursalParaMenu = currentUser.sucursal_asignada_id;
-        this.cargarMenuPorSucursal(this.sucursalParaMenu);
-      }
     } else {
       // Si llega aquí y no hay usuario logueado (y la ruta está protegida por authGuard),
       // debería haber sido redirigido al login. Esto es una advertencia de seguridad.
@@ -124,16 +117,25 @@ export class RegistrarPedidoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onSucursalParaMenuChange(event: Event): void {
+  onSucursalChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     const sucursalId = parseInt(selectElement.value, 10);
+
+    // Cambiar de sucursal invalida el producto ya elegido (puede no existir en la otra sucursal).
+    this.nuevoPedido.producto_id = '';
+    this.nuevoPedido.nombre_producto = '';
+    this.nuevoPedido.categoria = '';
+    this.nuevoPedido.precio_unitario = 0;
+    this.nuevoPedido.cantidad = 1;
+
     if (!isNaN(sucursalId) && sucursalId) {
-      this.sucursalParaMenu = sucursalId;
       this.cargarMenuPorSucursal(sucursalId);
     } else {
-      this.sucursalParaMenu = null;
       this.productosDelMenu = [];
     }
+
+    this.cdr.detectChanges();
+    setTimeout(() => M.updateTextFields(), 50);
   }
 
   cargarMenuPorSucursal(sucursalId: number): void {
@@ -165,19 +167,9 @@ export class RegistrarPedidoComponent implements OnInit, AfterViewInit {
     this.nuevoPedido.categoria = producto.categoria;
     this.nuevoPedido.precio_unitario = producto.precio_unitario;
     this.nuevoPedido.cantidad = 1;
-
-    // Autocompletar la sucursal del pedido con la sucursal del menú actualmente visible
-    // O con la sucursal asignada al empleado si el usuario es empleado
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser && currentUser.rol === 'empleado' && currentUser.sucursal_asignada_id !== null) {
-      this.nuevoPedido.sucursal_id = currentUser.sucursal_asignada_id;
-    } else if (this.sucursalParaMenu !== null) {
-      this.nuevoPedido.sucursal_id = this.sucursalParaMenu;
-    }
-    // Si no hay sucursal de usuario ni menú seleccionado, el usuario deberá elegirla manualmente.
+    // nuevoPedido.sucursal_id ya quedó fijo al elegir la sucursal que cargó este menú.
 
     this.cdr.detectChanges();
-    this.initMaterializeSelects(); // Reinicializar el select de sucursal del pedido
     setTimeout(() => M.updateTextFields(), 50);
 
     M.toast({ html: `"${producto.nombre_producto}" seleccionado. Disp: ${producto.cantidad_disponible}`, classes: 'blue rounded lighten-1' });
@@ -195,13 +187,8 @@ export class RegistrarPedidoComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Validación de stock en el frontend
-    let productoParaValidarStock: ProductoMenu | undefined;
-    if (this.nuevoPedido.sucursal_id === this.sucursalParaMenu) {
-      productoParaValidarStock = this.productosDelMenu.find(p => p.producto_id === this.nuevoPedido.producto_id);
-    } else {
-      console.warn("El menú visible es de una sucursal diferente a la del pedido. El backend validará el stock.");
-    }
+    // Validación de stock en el frontend (el menú visible siempre es el de la sucursal elegida)
+    const productoParaValidarStock = this.productosDelMenu.find(p => p.producto_id === this.nuevoPedido.producto_id);
 
     if (productoParaValidarStock && this.nuevoPedido.cantidad > productoParaValidarStock.cantidad_disponible) {
       M.toast({ html: `Stock insuficiente para "${this.nuevoPedido.nombre_producto}" en la sucursal ${this.nuevoPedido.sucursal_id}. Disponibles: ${productoParaValidarStock.cantidad_disponible}`, classes: 'red rounded', displayLength: 5000 });
@@ -229,9 +216,8 @@ export class RegistrarPedidoComponent implements OnInit, AfterViewInit {
         this.nuevoPedido.precio_unitario = 0;
         // No reseteamos nuevoPedido.username ni nuevoPedido.sucursal_id aquí.
 
-        const sucursalAActualizar = this.sucursalParaMenu || this.nuevoPedido.sucursal_id;
-        if (sucursalAActualizar) {
-          this.cargarMenuPorSucursal(sucursalAActualizar);
+        if (this.nuevoPedido.sucursal_id) {
+          this.cargarMenuPorSucursal(this.nuevoPedido.sucursal_id);
         }
 
         this.cdr.detectChanges();

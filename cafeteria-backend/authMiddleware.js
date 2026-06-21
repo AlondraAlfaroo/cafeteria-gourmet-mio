@@ -50,27 +50,15 @@ function requireRole(...rolesPermitidos) {
     };
 }
 
-// Para dar de alta un pedido: si el usuario es 'empleado' con sucursal asignada,
-// se ignora/sobrescribe la sucursal enviada por el cliente y se fuerza la suya,
-// para que no pueda registrar ventas a nombre de otra tienda.
-function forzarSucursalEnPedido(req, res, next) {
-    const user = req.user;
-    if (user.rol === 'empleado' && user.sucursal_asignada_id !== null && user.sucursal_asignada_id !== undefined) {
-        req.body.sucursal_id = user.sucursal_asignada_id;
-    }
-    next();
-}
-
 // Para consultar/reportar una sucursal especifica: admin entra a cualquiera,
-// empleado sin sucursal asignada (corporativo) entra a cualquiera,
-// empleado con sucursal asignada solo entra a la suya, y cualquier otro rol queda fuera.
+// empleado solo entra a la suya (si no tiene sucursal asignada, no entra a ninguna),
+// y cualquier otro rol queda fuera.
 function restringirAccesoASucursal(getSucursalId) {
     return (req, res, next) => {
         const user = req.user;
         const sucursalSolicitada = parseInt(getSucursalId(req), 10);
 
         if (user.rol === 'admin') return next();
-        if (user.rol === 'empleado' && (user.sucursal_asignada_id === null || user.sucursal_asignada_id === undefined)) return next();
         if (user.rol === 'empleado' && user.sucursal_asignada_id === sucursalSolicitada) return next();
 
         return res.status(403).json({ error: 'Acceso denegado. No tienes permiso para ver datos de esta sucursal.' });
@@ -81,6 +69,5 @@ module.exports = {
     generarToken,
     authenticateToken,
     requireRole,
-    forzarSucursalEnPedido,
     restringirAccesoASucursal
 };
