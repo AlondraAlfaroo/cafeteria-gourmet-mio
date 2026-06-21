@@ -9,8 +9,9 @@ export interface UserProfile {
   nombre_completo: string;
   rol: 'registrado' | 'empleado' | 'admin' | null;
   sucursal_asignada_id: number | null;
-  // token?: string; // Si usas JWT
 }
+
+const TOKEN_KEY = 'authTokenNoSQLatte';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -46,14 +47,18 @@ export class AuthService {
     return user ? user.sucursal_asignada_id : null;
   }
 
+  getToken(): string | null {
+    return localStorage.getItem(TOKEN_KEY);
+  }
+
   login(credentials: { username: string, password: string }): Observable<any> {
     return this.pedidoService.login(credentials).pipe(
       tap((response: any) => {
-        if (response && response.user) { // Asume que el backend devuelve { message: '...', user: UserProfile }
+        if (response && response.user && response.token) { // El backend devuelve { message, user, token }
           this.currentUserSubject.next(response.user);
           localStorage.setItem('currentUserNoSQLatte', JSON.stringify(response.user));
+          localStorage.setItem(TOKEN_KEY, response.token);
         } else {
-          // Manejar respuesta de login fallido sin 'user' si es necesario
           this.currentUserSubject.next(null);
         }
       })
@@ -69,6 +74,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('currentUserNoSQLatte');
+    localStorage.removeItem(TOKEN_KEY);
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }

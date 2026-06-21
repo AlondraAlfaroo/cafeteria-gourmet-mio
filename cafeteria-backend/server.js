@@ -1,7 +1,15 @@
 // server.js
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const db = require('./cassandraService');
+const {
+    generarToken,
+    authenticateToken,
+    requireRole,
+    forzarSucursalEnPedido,
+    restringirAccesoASucursal
+} = require('./authMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,10 +19,8 @@ const bcrypt = require('bcryptjs');
 app.use(cors());
 app.use(express.json());
 
-function isAdmin(req, res, next) {
-    console.warn("Implementar en Producción");
-    next();
-}
+// Requiere sesión válida y rol de administrador.
+const isAdmin = [authenticateToken, requireRole('admin')];
 
 app.get('/api/admin/producto/:sucursalId/:productoId', isAdmin, async (req, res) => {
     try {
@@ -166,7 +172,7 @@ async function startServer() {
         await db.connectDB();
 
         // Endpoint para registrar un nuevo pedido (MODIFICADO para recibir username)
-        app.post('/api/pedidos', async (req, res) => {
+        app.post('/api/pedidos', authenticateToken, forzarSucursalEnPedido, async (req, res) => {
             try {
                 const pedidoData = req.body; // Ahora pedidoData DEBE incluir 'username'
                 if (!pedidoData.producto_id || !pedidoData.sucursal_id || !pedidoData.cantidad || !pedidoData.username) { // <-- ¡username ahora es requerido!
@@ -233,7 +239,8 @@ async function startServer() {
                         rol: user.rol,
                         sucursal_asignada_id: user.sucursal_asignada_id
                     };
-                    res.json({ message: 'Login exitoso', user: userInfo });
+                    const token = generarToken(userInfo);
+                    res.json({ message: 'Login exitoso', user: userInfo, token });
                 } else {
                     return res.status(401).json({ error: 'Usuario o contraseña incorrectos.' }); // Mensaje genérico por seguridad
                 }
@@ -294,7 +301,7 @@ async function startServer() {
             }
         });
 
-        app.get('/api/pedidos/sucursal/:id', async (req, res) => {
+        app.get('/api/pedidos/sucursal/:id', authenticateToken, restringirAccesoASucursal(req => req.params.id), async (req, res) => {
             try {
                 const sucursalId = parseInt(req.params.id);
                 if (isNaN(sucursalId)) {
