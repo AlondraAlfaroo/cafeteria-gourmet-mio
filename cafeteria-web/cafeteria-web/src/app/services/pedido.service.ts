@@ -27,7 +27,7 @@ export interface ResumenSucursal {
   providedIn: 'root'
 })
 export class PedidoService {
-  private apiUrl = 'http://localhost:3000/api'; // URL de tu backend
+  private apiUrl = '/api'; // URL de tu backend
 
   constructor(private http: HttpClient) { }
 

@@ -6,7 +6,7 @@ import { ProductoMenu } from '../models/producto-menu.interface'; // Asegúrate 
 
 @Injectable({ providedIn: 'root' })
 export class AdminProductoService {
-  private apiUrl = 'http://localhost:3000/api/admin/productos'; // URL base para admin de productos
+  private apiUrl = '/api/admin/productos'; // URL base para admin de productos
 
   constructor(private http: HttpClient) { }
 

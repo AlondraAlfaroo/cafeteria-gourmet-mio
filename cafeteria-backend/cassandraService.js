@@ -1,6 +1,7 @@
 // cafeteria-backend/cassandraService.js
 // Este archivo contiene la lógica para conectar y realizar operaciones con la base de datos Cassandra.
 
+const path = require('path');
 // Importa el módulo 'cassandra-driver', que es la biblioteca oficial de Node.js para interactuar con Cassandra.
 const cassandra = require('cassandra-driver');
 // Importa TimeUuid, un tipo especial de ID que garantiza que los IDs sean únicos y ordenados por tiempo, útil para Cassandra.
@@ -12,19 +13,17 @@ const bcrypt = require('bcryptjs'); // Necesario para hashing de contraseñas
 const client = new cassandra.Client({
     // --- Configuración CRÍTICA para Astra DB ---
     cloud: {
-        // La ruta a tu archivo ZIP descargado. Debe ser relativa a donde ejecutas `node server.js`.
-        // Si el ZIP está en la misma carpeta que server.js:
-        secureConnectBundle: './secure-connect-nosqlatte-db.zip'
-        // Si lo pones en una subcarpeta 'certs' dentro de backend: './certs/secure-connect-bundle.zip'
+        // La ruta absoluta a tu archivo ZIP descargado para que funcione correctamente tanto localmente como en Vercel.
+        secureConnectBundle: path.resolve(__dirname, 'secure-connect-nosqlatte-db.zip')
     },
     credentials: {
-        username: 'token', // El Client ID de Astra (generalmente es 'token' para los tokens de aplicación)
-        password: 'AstraCS:HdypFtnbvKsdrKTjRZsYYvva:0ca21a525804b7106b1c0ace848a5a8737c9dd54ecaf6cedcc1ebc621c1a319a' // ¡TU Client Secret COMPLETO!
+        username: process.env.ASTRA_DB_USERNAME || 'token', // El Client ID de Astra (generalmente es 'token')
+        password: process.env.ASTRA_DB_PASSWORD || 'AstraCS:HdypFtnbvKsdrKTjRZsYYvva:0ca21a525804b7106b1c0ace848a5a8737c9dd54ecaf6cedcc1ebc621c1a319a' // ¡TU Client Secret COMPLETO!
     },
     // --- Fin Configuración CRÍTICA ---
 
     // Tu Keyspace en Astra DB
-    keyspace: 'cafeteria_gourmet',
+    keyspace: process.env.ASTRA_DB_KEYSPACE || 'cafeteria_gourmet',
     // ProtocolOptions y QueryOptions se mantienen como antes (Astra los usa internamente)
     protocolOptions: { port: 29042 }, // Puerto específico de Astra DB para CQLs (a menudo 29042)
     queryOptions: { consistency: cassandra.types.consistencies.quorum, readTimeout: 30000 }

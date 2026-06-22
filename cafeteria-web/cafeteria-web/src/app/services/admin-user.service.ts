@@ -6,7 +6,7 @@ import { UserProfile } from '../services/auth.service'; // Asegúrate que esta r
 
 @Injectable({ providedIn: 'root' })
 export class AdminUserService {
-  private apiUrl = 'http://localhost:3000/api/admin/usuarios'; // API para usuarios
+  private apiUrl = '/api/admin/usuarios'; // API para usuarios
 
   constructor(private http: HttpClient) { }
 

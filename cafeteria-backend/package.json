@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "check-db": "node /home/renemed/.gemini/antigravity-cli/brain/f887b075-a5c7-48fb-8208-e3858470a1f2/scratch/check_db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
