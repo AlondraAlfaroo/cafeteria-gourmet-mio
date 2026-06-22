@@ -1,6 +1,6 @@
 {
     "buildCommand": "npm install --legacy-peer-deps && npm run build",
-    "outputDirectory": "dist/cafeteria-web/browser/browser",
+    "outputDirectory": "dist/cafeteria-web/browser",
     "rewrites": [
         {
             "source": "/api/:path*",
